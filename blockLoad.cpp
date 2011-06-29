@@ -9,6 +9,23 @@
 
 #include "blockLoad.h"
 
+/******************
+ * config(string file) 
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    string file :
+ *
+ *  Output________
+ *
+ *    string :
+ *
+ */
+
+
 string config(string file){
   string ret;
 	ifstream config(ofToDataPath(file).c_str());
@@ -35,6 +52,23 @@ blockGroup::blockGroup(string dir)
   nLoaded=0;
   load(dir);
 }
+
+/******************
+ * load(string dir) :: member of blockGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    string dir :
+ *
+ *  Output________
+ *
+ *    void :
+ *
+ */
+
 
 void blockGroup::load(string dir)
 {
@@ -79,6 +113,23 @@ ofButton & rootGroup::operator()(int i)
 {
   return set[i].choice;
 }
+
+/******************
+ * getSelected() :: member of rootGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    blockGroup * :
+ *
+ */
+
 
 blockGroup * rootGroup::getSelected()
 {

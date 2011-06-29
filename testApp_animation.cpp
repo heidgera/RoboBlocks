@@ -9,6 +9,19 @@
 
 #include "testApp.h"
 
+/**
+ *  animationStepRequested(ofXML & animXML)- handles next step of an animation 
+ *
+ *  this function takes input from an xml file and, based on the animStep
+ * pushes the approriate step to the anim class.
+ *
+ *  Input_________
+ *    ofXML & animXML-- parsed xml file to be used in determining the next step;
+ *
+ *  Return________
+ *    NONE: function is a void.
+ */
+
 void testApp::animationStepRequested(ofXML & animXML)
 {
   //------- try to set the current tag for the current animation XML file
@@ -43,36 +56,55 @@ void testApp::animationStepRequested(ofXML & animXML)
           speed=ofToFloat(spd);
         }
       }
+      //------- if there is a pos tag inside the current tag, push into it
       if(animXML.getNumTag("pos")){
         animXML.pushTag("pos");
+        //------- and look at the type of position tag it is 
         string typ=animXML.getAttribute("type");
-        if(typ=="obj")
+        if(typ=="obj") //-- if it is an object tag, search for the specified object using the searchForObject function
           object = searchForObject(animXML.getCurrentTag(),xint,yint);
         else if(typ=="coord"){
+          //-------if it is a coordinate, set xint and yint to the x and y attributes.
           xint=ofToInt(animXML.getAttribute("x"));
           yint=ofToInt(animXML.getAttribute("y"));
         }
+        //-------if it is a mouse tag, set the xint and yint to the mouse coordinates
         else if(typ=="mouse") xint=mouseX,yint=mouseY;
         
-        if(!duration){
+        if(!duration){ //-- if we haven't yet set the duration, use the speed to determine duration
           int xtmp=((object)?object->x+xint:xint);
           int ytmp=((object)?object->y+yint:yint);
           double dist= sqrt((xtmp-anim.x)*(xtmp-anim.x)+(ytmp-anim.y)*(ytmp-anim.y));
           duration=dist/speed;
-          cout << dist << " is the distance" << endl;
         }
         
+        //-- if we are following an object, the next event is called, referencing that object
         if(object) anim.nextEvent(vType,(*object),xint, yint,duration);
-        else anim.nextEvent(vType,xint, yint,duration);
+        else anim.nextEvent(vType,xint, yint,duration);  //-- otherwise, it is called using only x and y
         animXML.popTag();
       }
-      else {
+      else { //-- if there is not a position tag inside, the next event takes place where the vMouse is currently located
         anim.nextEvent(vType,xint, yint,duration);
       }
     }
+    //-- if the animStep is greater than the current number of steps in the xml, end the animation
     else anim.nextEvent(OF_VMOUSE_END,mouseX,mouseY,0);
   }
 }
+
+/**
+ *  animationStepRequested(ofXML & animXML)- handles next step of an animation 
+ *
+ *  this function takes input from an xml file and, based on the animStep
+ * pushes the approriate step to the anim class.
+ *
+ *  Input_________
+ *    ofXML & animXML-- parsed xml file to be used in determining the next step;
+ *
+ *  Return________
+ *    NONE: function is a void.
+ */
+
 
 ofInterObj * testApp::searchForObject(ofTag & tag, int & _x, int & _y)
 {
