@@ -12,16 +12,16 @@
 /******************
  * config(string file) 
  *
- *  Description::
+ *  Description:: function to load ROOT_DIR information from 'file'
  *
  *
  *  Input_________
  *
- *    string file :
+ *    string file : filename of the config file which we wish to open
  *
  *  Output________
  *
- *    string :
+ *    string : string containing the root directory as provided by the config file, else, "." or current directory
  *
  */
 
@@ -47,6 +47,23 @@ string config(string file){
   return ret;
 }
 
+/******************
+ * blockGroup(string dir) :: constructor for blockGroup
+ *
+ *  Description:: constructor for a new block group; calls the load function for a directory
+ *
+ *
+ *  Input_________
+ *
+ *    string dir : path to the directory which we wish to index with the new blockGroup
+ *
+ *  Output________
+ *
+ *    New instance of blockGroup :
+ *
+ */
+
+
 blockGroup::blockGroup(string dir)
 {
   nLoaded=0;
@@ -56,19 +73,18 @@ blockGroup::blockGroup(string dir)
 /******************
  * load(string dir) :: member of blockGroup
  *
- *  Description::
- *
+ *  Description:: Searches through directory 'dir' to find "blocks.xml", "anim.xml", "icon.png" files and an optioinal "example.png" file
+ *    if found, each file is loaded appropriately.
  *
  *  Input_________
  *
- *    string dir :
+ *    string dir : directory to search for locating the relevant files
  *
  *  Output________
  *
- *    void :
+ *    NONE : simply loads the files into the program.
  *
  */
-
 
 void blockGroup::load(string dir)
 {
@@ -89,6 +105,22 @@ void blockGroup::load(string dir)
   cout << blockXML.filename << endl;
 }
 
+/******************
+ * load(string dir) :: member of rootGroup
+ *
+ *  Description:: Taking the root directory of the program as an argument, finds all folders which are not 'blocks', and creates a new
+ *    blockGroup for each.
+ *
+ *  Input_________
+ *
+ *    string dir : string containing the name of the root directory
+ *
+ *  Output________
+ *
+ *    NONE : load block groups into rootGroup instance
+ *
+ */
+
 void rootGroup::load(string dir)
 {
   int nDir=0;
@@ -104,20 +136,53 @@ void rootGroup::load(string dir)
   }
 }
 
+/******************
+ * operator[](int i) :: member of rootGroup
+ *
+ *  Description:: accessor operator; returns the ith member of the blockGroup vector
+ *
+ *
+ *  Input_________
+ *
+ *    int i :
+ *
+ *  Output________
+ *
+ *    blockGroup & :
+ *
+ */
+
+
 blockGroup & rootGroup::operator[](int i)
 {
   return set[i];
 }
+
+/*****************************************************************
+ * operator()(int i) :: member of rootGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    int i :
+ *
+ *  Output________
+ *
+ *    ofButton & :
+ *
+ */
 
 ofButton & rootGroup::operator()(int i)
 {
   return set[i].choice;
 }
 
-/******************
+/*****************************************************************
  * getSelected() :: member of rootGroup
  *
- *  Description::
+ *  Description:: if there is a group selected, returns the selected member of 'set'; else returns 0;
  *
  *
  *  Input_________
@@ -126,7 +191,7 @@ ofButton & rootGroup::operator()(int i)
  *
  *  Output________
  *
- *    blockGroup * :
+ *    blockGroup * : returns the address of the currently chosen member of 'set'
  *
  */
 
@@ -139,6 +204,24 @@ blockGroup * rootGroup::getSelected()
   }
   return ret;
 }
+
+/*****************************************************************
+ * clickDown :: member of rootGroup
+ *
+ *  Description:: Handles the clickdown function for the ofButtons in each of the members of 'set'
+ *
+ *
+ *  Input_________
+ *
+ *    int _x :  The x coordinate of the mouse click.
+ *    int _y :  The y coordinate of the mouse click.
+ *
+ *  Output________
+ *
+ *    bool :    Returns whether or not a button was clicked.
+ *
+ */
+
 
 bool rootGroup::clickDown(int _x, int _y)
 {
@@ -154,13 +237,48 @@ bool rootGroup::clickDown(int _x, int _y)
   }
   return ret;
 }
-  
+
+/*****************************************************************
+ * clickUp :: member of rootGroup
+ *
+ *  Description:: handles clickup for each of the buttons in the members of 'set'
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    NONE :  Resets the clicked state of each of the buttons in 'set'
+ *
+ */
+
+
 void rootGroup::clickUp()
 {
   for (unsigned int i=0; i<size(); i++) {
     set[i].choice.clickUp();
   }
 }
+
+/******************
+ * reset() :: member of rootGroup
+ *
+ *  Description:: Clears the availablility of the buttons.
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    NONE :  All of the buttons are now available to be clicked.
+ *
+ */
+
+
 void rootGroup::reset()
 {
   for (unsigned int j=0; j<size(); j++) {
