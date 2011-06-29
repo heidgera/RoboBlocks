@@ -17,7 +17,6 @@ void testApp::setup(){
 	
 	//--------- Load the background images (wood panel and aluminum
 	background.loadImage("images/background.jpg");
-	sideBarBack.loadImage("images/woodPanel.jpg");
 	
 	//--------- Load the images for the buttons
 	clearBut.setup(64,64,"images/deleteBlocks2.png");
@@ -29,9 +28,9 @@ void testApp::setup(){
 	
   demo.setup("View demo", "fonts/Arial.ttf", 20);
 	//--------- Load font for drawing on screen
-	arial.loadFont("fonts/DinC.ttf");
-	arial.setSize(30);
-	arial.setMode(OF_FONT_CENTER);
+	titleFont.loadFont("fonts/DinC.ttf");
+	titleFont.setSize(30);
+	titleFont.setMode(OF_FONT_CENTER);
   
   label.loadFont("fonts/Arial.ttf");
   label.setSize(20);
@@ -141,15 +140,15 @@ void testApp::draw(){
 		int titleBarH=100;
     int subTitleH=50;
     
-    arial.setSize(70);
-		arial.setMode(OF_FONT_TOP);
+    titleFont.setSize(70);
+		titleFont.setMode(OF_FONT_TOP);
 		string title="Program the "+ROOT_NAME+" behaviors";
     double scaleTitle=1;
-    if(arial.stringWidth(title)>ofGetWidth()){
-      scaleTitle=(3*ofGetWidth()/4)/arial.stringWidth(title);
+    if(titleFont.stringWidth(title)>ofGetWidth()){
+      scaleTitle=(3*ofGetWidth()/4)/titleFont.stringWidth(title);
     }
     
-    titleBarH=arial.stringHeight(title)*scaleTitle+10;
+    titleBarH=titleFont.stringHeight(title)*scaleTitle+10;
     
     int menuBot=titleBarH+menuBarH;
     int subtitleBot=menuBot+subTitleH;
@@ -170,17 +169,17 @@ void testApp::draw(){
     
     //****************** Title text, scaled
 		
-    arial.setSize(70);
-		arial.setMode(OF_FONT_TOP);
+    titleFont.setSize(70);
+		titleFont.setMode(OF_FONT_TOP);
 		ofSetColor(0xDFF500);
     ofPushMatrix();
     ofTranslate(ofGetWidth()/2, 0, 0);
     ofScale(scaleTitle, scaleTitle, 0);
-		arial.drawString(title,0, 0);
+		titleFont.drawString(title,0, 0);
     ofPopMatrix();
-    arial.setMode(OF_FONT_CENTER);
-    arial.setMode(OF_FONT_BOT);
-    arial.setSize(30);
+    titleFont.setMode(OF_FONT_CENTER);
+    titleFont.setMode(OF_FONT_BOT);
+    titleFont.setSize(30);
 
 		
 		//********************** Draw the blocks which are being held by the mouse ********
@@ -200,16 +199,16 @@ void testApp::draw(){
     ofRect(0, 0, ofGetWidth(), ofGetHeight());
 		ofSetColor(255, 255, 255);
 		spinner.draw((ofGetWidth())/2,ofGetHeight()/2, 300);
-		arial.setMode(OF_FONT_LEFT);
-		arial.setSize(70);
+		titleFont.setMode(OF_FONT_LEFT);
+		titleFont.setSize(70);
 		string printOut="uploading";
 		for (int i=0; i<(spinner.count()/3)%4; i++) {
 			printOut.append(".");
 		}
 		ofSetColor(255, 255, 255);
-		arial.drawString(printOut, ofGetWidth()/4, ofGetHeight()/4);
-		arial.setMode(OF_FONT_CENTER);
-		arial.setSize(30);
+		titleFont.drawString(printOut, ofGetWidth()/4, ofGetHeight()/4);
+		titleFont.setMode(OF_FONT_CENTER);
+		titleFont.setSize(30);
 	}
 	
   //*************** Draw the cursor on the screen
