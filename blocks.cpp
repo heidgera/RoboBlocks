@@ -225,7 +225,6 @@ block::block(const block &t){
 }
 
 block::~block() {
-	ins.clear();
 	blocksOn.clear();
 	blocksIn.clear();
 	ddGroup.clear();

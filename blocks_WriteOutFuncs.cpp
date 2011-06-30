@@ -240,6 +240,22 @@ void bGroup::resetUsed(block & t)
 	}
 }
 
+/*****************************************************************
+ * resetUsed() :: function of bGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
+
 void bGroup::resetUsed()
 {
 	resetUsed(base);
@@ -248,12 +264,44 @@ void bGroup::resetUsed()
 	}
 }
 
+/*****************************************************************
+ * writeFile(string filename) :: function of bGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    string filename :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
+
 void bGroup::writeFile(string filename)
 {
   ofstream out(ofToDataPath(filename).c_str());
 	writeFile(&out);
 	out.close();
 }
+
+/*****************************************************************
+ * writeFile(ofstream *k) :: function of bGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    ofstream *k :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
 
 void bGroup::writeFile(ofstream *k){
 	//blocks[lastBlock].printOut(k);

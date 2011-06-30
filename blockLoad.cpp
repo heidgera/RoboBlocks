@@ -63,7 +63,6 @@ string config(string file){
  *
  */
 
-
 blockGroup::blockGroup(string dir)
 {
   nLoaded=0;

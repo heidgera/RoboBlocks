@@ -29,12 +29,47 @@ enum ofBlockType {
 	OF_BLOCK_ON,OF_BLOCK_IN,OF_BLOCK_NUM
 };
 
+/*****************************************************************
+ * class block: public ofInterObj 
+ *
+ *  Description:: 
+ *
+ *
+ *  Vars:
+ *
+ *   ofColor color::_ _ _ _ _ _ _ _ 
+ *   bool grabbed:: _ _ _ _ _ _ _ _ 
+ *   bool grabbedOn:: _ _ _ _ _ _ _ 
+ *   bool placeHolder:: _ _ _ _ _ _ 
+ *   int ddOpen:: _ _ _ _ _ _ _ _ _ 
+ *   bool cond::_ _ _ _ _ _ _ _ _ _ 
+ *   bool numBlock::_ _ _ _ _ _ _ _ 
+ *   bool  numHolder::_ _ _ _ _ _ _ 
+ *   bool ddSelected::_ _ _ _ _ _ _ 
+ *   bool deleteMe::_ _ _ _ _ _ _ _ 
+ *   bool  bBase::_ _ _ _ _ _ _ _ _ 
+ *   bool bSeq::_ _ _ _ _ _ _ _ _ _ 
+ *   vector<block> numBlocks::_ _ _ 
+ *   vector<block> blocksIn:: _ _ _ 
+ *   vector<block> blocksOn:: _ _ _ 
+ *   ofFontContainer arialHeader::_ 
+ *   vector<string> part::_ _ _ _ _ 
+ *   unsigned char typ::_ _ _ _ _ _ 
+ *   vector<ofDropDown> ddGroup:: _ 
+ *   vector<block> ins::_ _ _ _ _ _ 
+ *   int oH:: _ _ _ _ _ _ _ _ _ _ _ 
+ *   int titleDisp::_ _ _ _ _ _ _ _ 
+ *   int xo:: _ _ _ _ _ _ _ _ _ _ _ 
+ *   string filename::_ _ _ _ _ _ _ 
+ *   string title:: _ _ _ _ _ _ _ _ 
+ *   placeHolder=true:: _ _ _ _ _ _ 
+ */
+
 class block: public ofInterObj {
 public:
 	ofColor color;
 	bool grabbed,grabbedOn,placeHolder;
 	int ddOpen;
-	//-------- Respectively, bracket block, conditional statement block, guard block, which dropDown is selected, to be deleted
 	bool cond,numBlock, numHolder,ddSelected,deleteMe, bBase,bSeq;
 	vector<block> numBlocks;
 	vector<block> blocksIn;
@@ -43,7 +78,6 @@ public:
 	vector<string> part;
 	unsigned char typ;
 	vector<ofDropDown> ddGroup;
-	vector<block> ins;
 	int oH,titleDisp,xo;
 	string filename;
 	string title;
@@ -157,6 +191,20 @@ public:
 	int blockIsBelow(block t);
 };
 
+/*****************************************************************
+ * struct storageState 
+ *
+ *  Description:: 
+ *
+ *
+ *  Vars:
+ *
+ *    vector<block> blocks:: _ _ _ _ 
+ *    block base:: _ _ _ _ _ _ _ _ _ 
+ *    blocks=k:: _ _ _ _ _ _ _ _ _ _ 
+ *    base=b:: _ _ _ _ _ _ _ _ _ _ _ 
+ */
+
 struct storageState {
   vector<block> blocks;
   block base;
@@ -166,6 +214,29 @@ struct storageState {
     base=b;
   }
 };
+
+/*****************************************************************
+ * class bGroup: public ofInterObj 
+ *
+ *  Description:: 
+ *
+ *
+ *  Vars:
+ *
+ *    vector<block> blocks:: _ _ _ _ _ _ 
+ *    map<string,bool> used::_ _ _ _ _ _
+ *    deque<storageState> storedState::_
+ *    int stateCount:: _ _ _ _ _ _ _ _ _
+ *    ofImage rTop:: _ _ _ _ _ _ _ _ _ _
+ *    ofImage rBot:: _ _ _ _ _ _ _ _ _ _
+ *    ofImage rSide::_ _ _ _ _ _ _ _ _ _
+ *    public: block base:: _ _ _ _ _ _ _
+ *    clock_t dblClick:: _ _ _ _ _ _ _ _
+ *    int lastBlock::_ _ _ _ _ _ _ _ _ _
+ *    bool grabbed,inHand,ddopen:: _ _ _
+ *    double dispx, dispy::_ _ _ _ _ _ _
+ *    double placex, placey::_ _ _ _ _ _
+ */
 
 class bGroup: public ofInterObj {
 	vector<block> blocks;
@@ -267,6 +338,28 @@ public:
 	int above(int i, int j);
 };
 
+/*****************************************************************
+ * class sideBar: public ofInterObj 
+ *
+ *  Description:: 
+ *
+ *
+ *  Vars:
+ *
+ *    public: ofFont arialLabel::_ _ 
+ *    ofFont arialHeader:: _ _ _ _ _ 
+ *    bool Open::_ _ _ _ _ _ _ _ _ _ 
+ *    float r,g,b::_ _ _ _ _ _ _ _ _ 
+ *    ofColor color::_ _ _ _ _ _ _ _ 
+ *    int xo,yo::_ _ _ _ _ _ _ _ _ _ 
+ *    //bool grabbed:: _ _ _ _ _ _ _ 
+ *    string filename::_ _ _ _ _ _ _ 
+ *    vector<block> blocks:: _ _ _ _ 
+ *    double space:: _ _ _ _ _ _ _ _ 
+ *    //int textNum::_ _ _ _ _ _ _ _ 
+ *    return blocks[i]:: _ _ _ _ _ _ 
+ */
+
 class sideBar: public ofInterObj {
 public:
 	ofFont arialLabel;
@@ -299,6 +392,22 @@ public:
 	
 	//void draw(double k,double space);
 };
+
+/*****************************************************************
+ * class sbGroup : public ofInterObj 
+ *
+ *  Description:: 
+ *
+ *
+ *  Vars:
+ *
+ *    bGroup * dest::_ _ _ _ _ _ _ _
+ *    int sideBarSpace:: _ _ _ _ _ _ 
+ *    public: vector<sideBar> bars:: 
+ *    return bars[i]:: _ _ _ _ _ _ _ 
+ *    friend class bGroup::_ _ _ _ _ 
+ */
+
 
 class sbGroup : public ofInterObj {
 	bGroup * dest;

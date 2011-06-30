@@ -21,6 +21,7 @@ void block::motion(int _x, int _y)
 	}
 }
 
+
 //****************************** Click Functions ************************
 
 bool block::ddClickDown(int _x, int _y,bool & ddopen, bool inHand)

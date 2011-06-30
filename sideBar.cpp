@@ -14,6 +14,25 @@ extern string defaultFont;
 /****************************** Sidebar *******************************
  **********************************************************************/
 
+/*****************************************************************
+ * sideBar(int _x,int _y,int w,int h,string file,ofColor col):ofInterObj(_x,_y,w,h) :: constructor for sideBar, a subclass of ofInterObj(_x,_y,w,h)
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    _x :
+ *    _y :
+ *    w :
+ *    h :
+ *
+ *  Output________
+ *
+ *    New instance of sideBar :
+ *
+ */
+
 sideBar::sideBar(int _x,int _y,int w,int h,string file,ofColor col):ofInterObj(_x,_y,w,h){
 	arialHeader.loadFont("DinC.ttf");
 	arialHeader.setSize(20);
@@ -25,6 +44,22 @@ sideBar::sideBar(int _x,int _y,int w,int h,string file,ofColor col):ofInterObj(_
 	filename=file;
 }
 
+/*****************************************************************
+ * sideBar():ofInterObj() :: constructor for sideBar, a subclass of ofInterObj()
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    New instance of sideBar :
+ *
+ */
+
 sideBar::sideBar():ofInterObj(){
 	arialHeader.loadFont(defaultFont);
 	arialHeader.setSize(20);
@@ -32,8 +67,41 @@ sideBar::sideBar():ofInterObj(){
 	Open = false;
 }
 
+/*****************************************************************
+ * ~sideBar() :: deconstructor for sideBar
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    New instance of sideBar :
+ *
+ */
+
 sideBar::~sideBar() {
 }
+
+/*****************************************************************
+ * operator=(const sideBar t) :: function of sideBar
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    const sideBar t :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
+
 void sideBar::operator=(const sideBar t) {
 	x=t.x;
 	y=t.y;
@@ -42,6 +110,23 @@ void sideBar::operator=(const sideBar t) {
 	xo=t.xo;
 	yo=t.yo;
 }
+
+/*****************************************************************
+ * draw() :: function of sideBar
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
+
 void sideBar::draw(){
 	if(Open){
 		roundedShadow(x+20,y,w,h,h/2,.5);
@@ -58,6 +143,22 @@ void sideBar::draw(){
 	}
 }
 
+/*****************************************************************
+ * draw(int _x, int _y) :: function of sideBar
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    int _x :
+ *     int _y :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
 
 void sideBar::draw(int _x, int _y){
 	x=_x, y=_y;
@@ -78,6 +179,22 @@ void sideBar::draw(int _x, int _y){
 	}
 }
 
+/*****************************************************************
+ * updateSize() :: function of sideBar
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    double :
+ *
+ */
+
 double sideBar::updateSize()
 {
 	for (unsigned int i=0; i<blocks.size(); i++) {
@@ -91,6 +208,22 @@ double sideBar::updateSize()
 /****************************** Sidebar Group *************************
  **********************************************************************/
 
+/*****************************************************************
+ * updateBlocks(int i) :: function of sbGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    int i :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
+
 void sbGroup::updateBlocks(int i){
 	int divs=bars[i].blocks.size();
 	for (unsigned int j=0; j<divs; j++) {
@@ -101,6 +234,22 @@ void sbGroup::updateBlocks(int i){
 		bars[i].blocks[j].h=bars[i].blocks[j].oH*((bars[i+1].y-(bars[i].y+bars[i].h))/sideBarSpace);
 	}
 }
+
+/*****************************************************************
+ * sbGroup(ofXML & xml,bGroup * destin):ofInterObj() :: constructor for sbGroup, a subclass of ofInterObj()
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    New instance of sbGroup :
+ *
+ */
 
 
 sbGroup::sbGroup(ofXML & xml,bGroup * destin):ofInterObj(){
@@ -141,9 +290,41 @@ sbGroup::sbGroup(ofXML & xml,bGroup * destin):ofInterObj(){
 	}
 }
 
+/*****************************************************************
+ * setDest(bGroup * destin) :: member of sbGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    bGroup Desktop Documents Downloads Java Library Mail Movies Music Pictures Public Sites bin doc example gmon.out include libtool modkit-community-edition-read-only python tmp xstc destin :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
+
 void sbGroup::setDest(bGroup * destin){
 	dest=destin;
 }
+
+/*****************************************************************
+ * updateHeight() :: member of sbGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
 
 void sbGroup::updateHeight(){
 	double maxWid=0;
@@ -164,6 +345,22 @@ void sbGroup::updateHeight(){
 	}
 }
 
+/*****************************************************************
+ * update() :: member of sbGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
+
 void sbGroup::update()
 {
 	for (unsigned int i=0; i<bars.size(); i++) {
@@ -174,6 +371,22 @@ void sbGroup::update()
 		}
 	}
 }
+
+/*****************************************************************
+ * unfold() :: member of sbGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
 
 void sbGroup::unfold(){
 	for (unsigned int i=0; i<bars.size()-1; i++) {
@@ -198,13 +411,45 @@ void sbGroup::unfold(){
 	}
 }
 
+/*****************************************************************
+ * draw(int _x, int _y) :: member of sbGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    int _x :
+ *     int _y :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
+
 void sbGroup::draw(int _x, int _y)
 {
 	x=_x, y=_y;
-	//h=ofGetHeight()-y-20;
-	//sideBarSpace=h-40*(bars.size()-1);
 	draw();
 }
+
+/*****************************************************************
+ * draw() :: member of sbGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
+
 
 void sbGroup::draw(){
 	
@@ -228,6 +473,23 @@ void sbGroup::draw(){
 	bars[bars.size()-1].y=y+h;
 }
 
+/*****************************************************************
+ * clickDown(double _x, double _y) :: member of sbGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    double _x :
+ *     double _y :
+ *
+ *  Output________
+ *
+ *    bool :
+ *
+ */
+
 bool sbGroup::clickDown(double _x, double _y){
 	bool ret=false;
 	for (unsigned int i=0; i<bars.size()-1; i++) {
@@ -245,10 +507,3 @@ bool sbGroup::clickDown(double _x, double _y){
 	}
 	return ret;
 }
-/*int sbGroup::size(){
-	int ret=0;
-	for (unsigned int i=0; i<bars.size(); i++) {
-		ret+=bars[i].blocks.size();
-	}
-	return ret;
-}*/
