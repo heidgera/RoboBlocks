@@ -150,7 +150,7 @@ void bGroup::blockDown(block & t,int _x,int _y){
 	int ret=0;
 	int pos=0;
   if (!inHand&&!ddopen&&t.clickDown(_x,_y)) {
-    inHand=true;
+    ret=inHand=true;
     
     //-------- and change the anchor point
     dispx = t.x-_x;
@@ -174,7 +174,11 @@ void bGroup::blockDown(block & t,int _x,int _y){
 		}
 	}
 	//-------- if we are on a block inside, add the block inside to the main group
-	else if(t.onBlockIn(_x,_y)&&!t.bSeq) addFromClick(t, _x, _y);
+	else if(pos=t.onBlockIn(_x,_y)&&!t.bSeq){
+    if(!t.blocksIn[pos-1].onBlockIn(_x,_y))
+      addFromClick(t, _x, _y);
+    else blockDown(t.blocksIn[pos-1], _x, _y);
+  }
 	else if(ret=t.onBlockNum(_x, _y)){
 		//-------- if we are on a cond statement block, add it to the main group,
 		//-------- and turn the previous one back to placeholder
@@ -193,11 +197,11 @@ void bGroup::blockDown(block & t,int _x,int _y){
 	
 	else {
 		//-------- check all connected blocks
-		for (unsigned int i=0; i<t.numInside(); i++) {
+		for (unsigned int i=0; i<t.numInside()&&ret==0; i++) {
 			if(!t.bSeq)
 				blockDown(t.blocksIn[i], _x, _y);
 		}
-		for (unsigned int i=0; i<t.size(); i++) {
+		for (unsigned int i=0; i<t.size()&&ret==0; i++) {
 			blockDown(t.blocksOn[i], _x, _y);
 		}
 	}
@@ -210,18 +214,6 @@ void bGroup::doubleClick(double _x, double _y, void func()){
 void bGroup::clickDown(double _x, double _y){
 	for (int i=0; i<blocks.size(); i++) {
 		//-------- if we are over a block, pick it up
-		/*if (!inHand&&!ddopen&&blocks[i].clickDown(_x,_y)) {
-			inHand=true;
-			
-			//-------- and change the anchor point
-			dispx = blocks[i].x-_x;
-			dispy = blocks[i].y-_y;
-		}*/
-		/*//-------- check to see if we are doing things with drop downs
-		if(blocks[i].ddClickDown(_x,_y,ddopen,inHand)||blocks[i].ddSelected);
-		
-		//-------- finally, check to see if we are interacting with connected blocks
-		else blockDown(blocks[i],_x,_y);*/
     if(blocks[i].ddClickDown(_x,_y,ddopen,inHand)||blocks[i].ddSelected);
     else blockDown(blocks[i],_x,_y);
 	}

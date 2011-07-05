@@ -78,6 +78,9 @@ public:
 	unsigned char typ;
 	vector<ofDropDown> ddGroup;
 	int oH,titleDisp,xo;
+  
+  int h0,w0,xIn0,yIn0,hIn0;
+  
 	string filename;
 	string title;
 	
@@ -175,7 +178,7 @@ public:
 	
 	bool partnerWritten(map<string,bool> * printed);
 	
-	void newPrintOut(ofstream* k,ifstream * f,int t=0, map<string,bool> * printed=0);
+	void printOut(ofstream* k,ifstream * f,int t=0, map<string,bool> * printed=0);
 	
 	void printData(string part,ofstream* k,int t=0,map<string,bool> * printed=0, bool printIn=true);
 	
@@ -188,6 +191,29 @@ public:
 	vector<block> passBlocks(ofBlockType d,int start);
 	
 	int blockIsBelow(block t);
+  
+  //--------------------------- New functions --------------------------
+  
+  bool bGrabbed, bConditional, null;
+  
+  int newHeightOn();
+  
+  int newHeightIn();
+  
+  void newUpdateHeight(block * held=0);
+  
+  void newUpdatePositions(block * held=0);
+  
+  bool newBelow(block & t);
+  
+  bool newInside(block & t);
+  
+  bool newClickInside(int _x, int _y);
+  
+  bool newClickDown(int x, int y);
+  
+  block separateBlock(ofBlockType bType, int index);
+  
 };
 
 /*****************************************************************
@@ -334,6 +360,13 @@ public:
 	int grabbedBlockBelow(int i, int j);
 	
 	int above(int i, int j);
+  
+  //--------------------- New functions ------------------------
+  
+  block held;
+  
+  bool newClickDown(int _x, int _y);
+  
 };
 
 /*****************************************************************

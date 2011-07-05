@@ -26,7 +26,7 @@ void resetList(block & t, map<string,bool> & used)
 
 //-------------------------- block Print functions-------------------------------------
 
-void block::newPrintOut(ofstream* fOut,ifstream * fInput,int t, map<string,bool> * printList){
+void block::printOut(ofstream* fOut,ifstream * fInput,int t, map<string,bool> * printList){
 	//******* okay, let's try this; this may be a fairly complicated way to write out the .pde for compiling
 	//******* and uploading, but it seems to work okay. This function reads a block of code from a file handed from the functions
 	//******* below, parses it to find references to contained blocks or dropdowns, and properly formats it
@@ -202,7 +202,7 @@ void block::printData(string part,ofstream* k,int t,map<string,bool> * printed, 
 		}
 		if(found){
 			//-------- printout the code for the start routines
-			newPrintOut(k,&f,t,printed);
+			printOut(k,&f,t,printed);
 			//-------- set the printed flag for the block and close the input 
 			(*printed)[title]=true;
 			f.close();

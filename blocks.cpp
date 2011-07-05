@@ -150,6 +150,13 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
       }
     }
 	}
+  h0=h;
+  w0=w;
+  if(cond){
+    xIn0=20;
+    yIn0=40;
+    hIn0=45;
+  }
 	int ddNum=0;
 	
 	//-------- assign a default value to the xdis of each dd
@@ -305,6 +312,11 @@ void block::operator=(const block &t) {
 	y=t.y;
 	w=t.w;
 	h=t.h;
+  w0=t.w0;
+  h0=t.h0;
+  yIn0=t.yIn0;
+  xIn0=t.xIn0;
+  hIn0=t.hIn0;
 	arialHeader=t.arialHeader;
 	oH=t.oH;
 	numBlock=t.numBlock;
@@ -434,11 +446,11 @@ void block::updatePositions(){
 
 void block::updatePositions(block & t){
 	
-	if(blocksIn.size()&&!bSeq&&blockIsInside(t)==1&&!blocksIn[0].onInside(t.x, t.y)) blocksIn[0].move(x+20,y+40+t.h+t.heightOnlyOn()),blocksIn[0].updatePositions(t);
-	else if(blocksIn.size()) blocksIn[0].move(x+20,y+40),blocksIn[0].updatePositions(t);
+	if(blocksIn.size()&&!bSeq&&blockIsInside(t)==1&&!blocksIn[0].onInside(t.x, t.y)) blocksIn[0].move(x+xIn0,y+yIn0-5+t.h+t.heightOnlyOn()),blocksIn[0].updatePositions(t);
+	else if(blocksIn.size()) blocksIn[0].move(x+xIn0,y+yIn0),blocksIn[0].updatePositions(t);
 	for (unsigned int i=1; i<blocksIn.size()&&blocksIn.size()>1; i++) {
-		if(blockIsInside(t)-2==i-1&&!bSeq&&!blocksIn[i-1].onInside(t.x, t.y)&&!blocksIn[i].cond) 
-			blocksIn[i].move(blocksIn[i-1].x,blocksIn[i-1].y+blocksIn[i-1].h+t.h+t.heightOnlyOn()-5);
+		if(blockIsInside(t)-1==i&&!bSeq&&!blocksIn[i-1].onInside(t.x, t.y)&&!blocksIn[i].cond) 
+			blocksIn[i].move(blocksIn[i-1].x,blocksIn[i-1].y+blocksIn[i-1].h+t.h+t.heightOnlyOn()-10);
 		else blocksIn[i].move(blocksIn[i-1].x,blocksIn[i-1].y+blocksIn[i-1].h-5);
 		blocksIn[i].updatePositions(t);
 	}
@@ -694,6 +706,22 @@ bGroup::bGroup(double _x, double _y,double wid,double hgt):ofInterObj(_x,_y,wid,
 	used[""]=false;
 }
 
+/*****************************************************************
+ * bGroup():ofInterObj() :: constructor for bGroup, a subclass of ofInterObj()
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    New instance of bGroup :
+ *
+ */
+
 bGroup::bGroup():ofInterObj(){
 	grabbed=inHand=ddopen=0;
 }
@@ -712,9 +740,6 @@ void bGroup::setup(double _x, double _y,double wid,double hgt){
   base.setup(530, 90);
 	base.blocksOn.reserve(100);
 	states.recordState(storageState(blocks,base));
-	rBot.loadImage("images/rBot.png");
-	rTop.loadImage("images/rTop.png");
-	rSide.loadImage("images/rSide.png");
 }
 
 int bGroup::size(){
@@ -832,8 +857,8 @@ int bGroup::heightUpdate(block & grab, block & comp)
 		heightUpdate(grab, comp.blocksOn[i]);
 	}
 	if(comp.blockIsInside(grab)&&!comp.bSeq&&!grab.numBlock){
-		if(!comp.inBlockIn(grab.x,grab.y)) comp.h=grab.heightOnlyOn(true)+comp.heightInside()+grab.h+65-((!comp.numInside())?40:0);
-		else comp.h=comp.heightInside()+65-((!comp.numInside())?40:0);
+		if(!comp.inBlockIn(grab.x,grab.y)) comp.h=grab.heightOnlyOn(true)+comp.heightInside()+grab.h+65-((!comp.numInside())?comp.yIn0:0)-5;
+		else comp.h=comp.heightInside()+65-((!comp.numInside())?comp.yIn0:0)-5;
 		comp.updatePositions(grab);
 	}
 	return ret;
@@ -853,7 +878,7 @@ void bGroup::update()
 			for (unsigned int j=0; j<blocks.size(); j++) {
 				if(i!=j) heightUpdate(blocks[i], blocks[j]);
 				if(blocks[i].onInside(blocks[j].x,blocks[j].y)&&!blocks[j].numBlock&&!blocks[i].inBlockIn(blocks[j].x, blocks[j].y)){
-					blocks[i].h=blocks[j].heightOnlyOn(true)+blocks[i].heightInside()+blocks[j].h+65-((!blocks[i].numInside())?40:0);
+					blocks[i].h=blocks[j].heightOnlyOn(true)+blocks[i].heightInside()+blocks[j].h+65-((!blocks[i].numInside())?blocks[j].yIn0:0)-5;
 					blocks[i].updatePositions(blocks[i]);
 				}
 			}
