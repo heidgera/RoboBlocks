@@ -210,6 +210,8 @@ public:
   
   bool newClickInside(int _x, int _y);
   
+  bool newClickDD(int _x, int _y, bool & ddopen);
+  
   bool newClickDown(int x, int y);
   
   block separateBlock(ofBlockType bType, int index);
@@ -366,6 +368,14 @@ public:
   block held;
   
   bool newClickDown(int _x, int _y);
+  
+  bool newClickUp(int _x, int _y);
+  
+  bool newHandleClickUp(block & grab, block & chk);
+  
+  bool newHandleClick(vector<block> & chk, int indx, int _x, int _y, bool top=false);
+  
+  void pullBlocks(vector<block> & chk, int i);
   
 };
 
