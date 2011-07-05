@@ -27,7 +27,24 @@
 
 string defaultFont="ArialNarrow.ttf";
 
-
+/*****************************************************************
+ * block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) :: constructor for block, a subclass of ofInterObj
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    -200 :
+ *    -200 :
+ *    150 :
+ *    45 :
+ *
+ *  Output________
+ *
+ *    New instance of block :
+ *
+ */
 
 block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
 	//********* This is the method by which all of the blocks are first generated from the xml files in the data root.
@@ -72,64 +89,66 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
 	for(int i=0;i<cur.size();i++){
 		string node[2]={cur[i].getLabel(),cur[i].getValue()};
 		//-- node[0] is the label, node[1] is the value
-		switch (list.find(node[0])->second) {
-			case 0: // indicates whether or not a block is a sequence of other blocks
-				bSeq=true;
-				break;
-			case 1: //-- cond
-				//-------- set cond=true, and change size
-				cond=atoi(node[1].c_str());
-				h=105;
-				w=200;
-				titleDisp=30;
-				break;
-			case 2: //wid, deprecated, handled with routines below switch
-				w=atoi(node[1].c_str());
-				break;
-			case 3: // hgt, deprecated, same as above
-				h=atoi(node[1].c_str());
-				break;
-			case 4: //ifblock
-				//-- sets the flag for being a numHolder
-				//-- deprecated, i think, by %n in the title
-				numHolder=true;
-				break;
-			case 5: // file
-				//-- definitely not deprecated, used to store value of which file to write from
-				filename=node[1];
-				break;
-			case 6: // part
-				//-- stores the name of the complement blocks
-				part.push_back(node[1]);
-				break;
-			case 7: // num
-				//-- set the statement block flag
-				numBlock=true;
-				titleDisp=0;
-				h=20;
-				w=90;
-				break;
-			case 8: // dropdown
-				//-- add a new dropdown menu to the block
-				ddGroup.push_back(ofDropDown(cur[i]));
-				break;
-			case 9:
-				for (unsigned int j=0; j<cur[i].size(); j++) {
-					if (cur[i][j].getLabel()=="block") {
-						blocksIn.push_back(block(cur[i][j],color,0));
-					}
-				}
-				break;
-      case 10:
-				for (unsigned int j=0; j<cur[i].size(); j++) {
-					if (cur[i][j].getLabel()=="block") {
-						blocksOn.push_back(block(cur[i][j],color,0));
-					}
-				}
-				break;
-			default:
-				break;
-		}
+    if(list.find(node[0])!=list.end()){
+      switch (list.find(node[0])->second) {
+        case 0: // indicates whether or not a block is a sequence of other blocks
+          bSeq=true;
+          break;
+        case 1: //-- cond
+          //-------- set cond=true, and change size
+          cond=atoi(node[1].c_str());
+          h=105;
+          w=200;
+          titleDisp=30;
+          break;
+        case 2: //wid, deprecated, handled with routines below switch
+          w=atoi(node[1].c_str());
+          break;
+        case 3: // hgt, deprecated, same as above
+          h=atoi(node[1].c_str());
+          break;
+        case 4: //ifblock
+          //-- sets the flag for being a numHolder
+          //-- deprecated, i think, by %n in the title
+          numHolder=true;
+          break;
+        case 5: // file
+          //-- definitely not deprecated, used to store value of which file to write from
+          filename=node[1];
+          break;
+        case 6: // part
+          //-- stores the name of the complement blocks
+          part.push_back(node[1]);
+          break;
+        case 7: // num
+          //-- set the statement block flag
+          numBlock=true;
+          titleDisp=0;
+          h=20;
+          w=90;
+          break;
+        case 8: // dropdown
+          //-- add a new dropdown menu to the block
+          ddGroup.push_back(ofDropDown(cur[i]));
+          break;
+        case 9:
+          for (unsigned int j=0; j<cur[i].size(); j++) {
+            if (cur[i][j].getLabel()=="block") {
+              blocksIn.push_back(block(cur[i][j],color,0));
+            }
+          }
+          break;
+        case 10:
+          for (unsigned int j=0; j<cur[i].size(); j++) {
+            if (cur[i][j].getLabel()=="block") {
+              blocksOn.push_back(block(cur[i][j],color,0));
+            }
+          }
+          break;
+        default:
+          break;
+      }
+    }
 	}
 	int ddNum=0;
 	
@@ -139,7 +158,9 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
 	}
 	
 	//-------- change the font size if it is a statement block
-	if(numBlock) arialHeader.setSize(7);
+	if(numBlock){
+    arialHeader.setSize(7);
+  }
 	
 	//-------- split the title into words by looking for " ", and establish a baseline for the width with "."
 	titleSplit = ofSplitString(title, " ");
@@ -220,15 +241,63 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
 	oH=h;
 }
 
+/*****************************************************************
+ * block(const block &t) :: constructor for block
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    const block &t :
+ *
+ *  Output________
+ *
+ *    New instance of block :
+ *
+ */
+
 block::block(const block &t){
 	*this=t;
 }
+
+/*****************************************************************
+ * ~block() :: deconstructor for block
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    New instance of block :
+ *
+ */
 
 block::~block() {
 	blocksOn.clear();
 	blocksIn.clear();
 	ddGroup.clear();
 }
+
+/*****************************************************************
+ * operator=(const block &t) :: function of block
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    const block &t :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
 
 void block::operator=(const block &t) {
 	x=t.x;
@@ -257,6 +326,23 @@ void block::operator=(const block &t) {
 	bBase=t.bBase;
 	bSeq=t.bSeq;
 }
+
+/*****************************************************************
+ * setup(double _w, double _h) :: function of block
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    double _w :
+ *     double _h :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
 
 void block::setup(double _w, double _h)
 {
@@ -296,7 +382,23 @@ block & block::operator[](int i){
 	return blocksOn[i];
 }
 
-//-------------------------- Updating Functions -------------------
+//-------------------------- Updating Functions --------------------------------------------------------
+
+/*****************************************************************
+ * updatePositions() :: function of block
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
 
 void block::updatePositions(){
 	if(blocksIn.size()) blocksIn[0].move(x+20,y+40),blocksIn[0].updatePositions();
@@ -313,6 +415,22 @@ void block::updatePositions(){
 			numBlocks[i].move(x+numBlocks[i].xo+1,y+(40-numBlocks[i].h)/2);
 	}
 }
+
+/*****************************************************************
+ * updatePositions(block & t) :: function of block
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    block & t :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
+ */
 
 void block::updatePositions(block & t){
 	
@@ -338,6 +456,22 @@ void block::updatePositions(block & t){
 	}
 }
 
+/*****************************************************************
+ * heightOnlyOn(bool moving) :: function of block
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    bool moving :
+ *
+ *  Output________
+ *
+ *    int :
+ *
+ */
+
 int block::heightOnlyOn(bool moving){
 	int ret=0;
 	for (unsigned int i=0; i<blocksOn.size(); i++) {
@@ -346,6 +480,22 @@ int block::heightOnlyOn(bool moving){
 	}
 	return ret;
 }
+
+/*****************************************************************
+ * heightInside() :: function of block
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    int :
+ *
+ */
 
 int block::heightInside(){
 	int ret=0;
@@ -358,6 +508,22 @@ int block::heightInside(){
 	}
 	return ret;
 }
+
+/*****************************************************************
+ * fullWidth() :: function of block
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    NONE :
+ *
+ *  Output________
+ *
+ *    double :
+ *
+ */
 
 double block::fullWidth()
 {
@@ -373,6 +539,22 @@ double block::fullWidth()
   ret=max(w,ret);
   return ret;
 }
+
+/*****************************************************************
+ * updateSize(int k) :: function of block
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    int k :
+ *
+ *  Output________
+ *
+ *    bool :
+ *
+ */
 
 bool block::updateSize(int k)
 {
@@ -527,11 +709,9 @@ void bGroup::setup(double _x, double _y,double wid,double hgt){
 	grabbed=inHand=ddopen=false;
 	cSetup(_x,_y,wid,hgt);
 	used[""]=false;
-	stateCount=0;
-	storedState.clear();
   base.setup(530, 90);
 	base.blocksOn.reserve(100);
-	storedState.push_front(storageState(blocks,base));
+	states.recordState(storageState(blocks,base));
 	rBot.loadImage("images/rBot.png");
 	rTop.loadImage("images/rTop.png");
 	rSide.loadImage("images/rSide.png");
@@ -552,44 +732,39 @@ block bGroup::operator[](int i){
 
 void bGroup::recordState()
 {
-	while (stateCount>0) {
-		storedState.pop_front();
-		stateCount--;
-	}
-	storedState.push_front(storageState(blocks,base));
-	if (storedState.size()>10) {
-		storedState.pop_back();
-	}
+	states.recordState(storageState(blocks,base));
 }
 
 void bGroup::undoState()
 {
-	if (storedState.size()&&++stateCount>storedState.size()-1) {
-		stateCount=storedState.size()-1;
-	}
-	if(storedState.size()){
-		blocks=storedState[stateCount].blocks;
-    base=storedState[stateCount].base;
+	if(states.undoAvailable()){
+    storageState * t;
+    if((t=states.undoState())){
+      blocks=t->blocks;
+      base=t->base;
+    }
   }
 }
 
 void bGroup::redoState()
 {
-	if (--stateCount<0) {
-		stateCount=0;
-	}
-	blocks=storedState[stateCount].blocks;
-  base=storedState[stateCount].base;
+	if(states.redoAvailable()){
+    storageState * t;
+    if((t=states.redoState())){
+      blocks=t->blocks;
+      base=t->base;
+    }
+  }
 }
 
 bool bGroup::undoAvailable()
 {
-	return (stateCount<storedState.size()-1);
+	return states.undoAvailable();
 }
 
 bool bGroup::redoAvailable()
 {
-	return stateCount>0;
+	return states.redoAvailable();
 }
 
 

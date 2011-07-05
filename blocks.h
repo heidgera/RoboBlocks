@@ -56,7 +56,6 @@ enum ofBlockType {
  *   vector<string> part::_ _ _ _ _ 
  *   unsigned char typ::_ _ _ _ _ _ 
  *   vector<ofDropDown> ddGroup:: _ 
- *   vector<block> ins::_ _ _ _ _ _ 
  *   int oH:: _ _ _ _ _ _ _ _ _ _ _ 
  *   int titleDisp::_ _ _ _ _ _ _ _ 
  *   int xo:: _ _ _ _ _ _ _ _ _ _ _ 
@@ -201,8 +200,6 @@ public:
  *
  *    vector<block> blocks:: _ _ _ _ 
  *    block base:: _ _ _ _ _ _ _ _ _ 
- *    blocks=k:: _ _ _ _ _ _ _ _ _ _ 
- *    base=b:: _ _ _ _ _ _ _ _ _ _ _ 
  */
 
 struct storageState {
@@ -241,8 +238,9 @@ struct storageState {
 class bGroup: public ofInterObj {
 	vector<block> blocks;
 	map<string,bool> used;
-	deque<storageState> storedState;
-	int stateCount;
+	//deque<storageState> storedState;
+	//int stateCount;
+  stateSave<storageState> states;
 	ofImage rTop;
 	ofImage	rBot;
 	ofImage rSide;

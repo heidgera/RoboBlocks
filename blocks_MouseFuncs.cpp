@@ -149,7 +149,14 @@ void bGroup::blockDown(block & t,int _x,int _y){
 	//*********** clickdown function for blocks in the blockgroup
 	int ret=0;
 	int pos=0;
-	if(pos=t.onBlockOn(_x,_y)){
+  if (!inHand&&!ddopen&&t.clickDown(_x,_y)) {
+    inHand=true;
+    
+    //-------- and change the anchor point
+    dispx = t.x-_x;
+    dispy = t.y-_y;
+  }
+	else if(pos=t.onBlockOn(_x,_y)){
 		if(t.blocksOn[pos-1].onBlockIn(_x, _y)&&!t.blocksOn[pos-1].bSeq) blockDown(t.blocksOn[pos-1], _x, _y);//addFromClick(t.blocksOn[pos-1], _x, _y);
 		//-------- if we are on a block below
 	
@@ -203,20 +210,22 @@ void bGroup::doubleClick(double _x, double _y, void func()){
 void bGroup::clickDown(double _x, double _y){
 	for (int i=0; i<blocks.size(); i++) {
 		//-------- if we are over a block, pick it up
-		if (!inHand&&!ddopen&&blocks[i].clickDown(_x,_y)) {
+		/*if (!inHand&&!ddopen&&blocks[i].clickDown(_x,_y)) {
 			inHand=true;
 			
 			//-------- and change the anchor point
 			dispx = blocks[i].x-_x;
 			dispy = blocks[i].y-_y;
-		}
-		//-------- check to see if we are doing things with drop downs
-		else if(blocks[i].ddClickDown(_x,_y,ddopen,inHand)||blocks[i].ddSelected);
+		}*/
+		/*//-------- check to see if we are doing things with drop downs
+		if(blocks[i].ddClickDown(_x,_y,ddopen,inHand)||blocks[i].ddSelected);
 		
 		//-------- finally, check to see if we are interacting with connected blocks
-		else blockDown(blocks[i],_x,_y);
+		else blockDown(blocks[i],_x,_y);*/
+    if(blocks[i].ddClickDown(_x,_y,ddopen,inHand)||blocks[i].ddSelected);
+    else blockDown(blocks[i],_x,_y);
 	}
-	if(base.ddClickDown(_x,_y,ddopen,inHand));
+	if(base.ddClickDown(_x,_y,ddopen,inHand)||base.ddSelected);
 	else blockDown(base, _x, _y);
 	//
 }
@@ -280,6 +289,24 @@ void bGroup::addNum(block & holder, block & held)
 		held.deleteMe=true;
 	}
 }
+
+/********************************************************************************************
+ * handleClickUps(block & grab, block & comp, bool checkOn) :: function of bGroup
+ *
+ *  Description::
+ *
+ *
+ *  Input_________
+ *
+ *    block & grab :
+ *     block & comp :
+ *     bool checkOn :
+ *
+ *  Output________
+ *
+ *    int :
+ *
+ */
 
 int bGroup::handleClickUps(block & grab, block & comp, bool checkOn){
 	int ret=0;
@@ -346,13 +373,23 @@ int bGroup::handleClickUps(block & grab, block & comp, bool checkOn){
 		ret=2;
 	}
 }
-	
 
-/** clickup function for the bGroup 
+/*****************************************************************
+ * clickUp(double _x, double _y) :: function of bGroup
  *
- * this is one of the primary functions in this whole program
- * it checks where we release each block, and tries to connect it where it should go
- * it's pretty dense; let's try explaining it
+ *  Description:: this is one of the primary functions in this whole program
+ *    it checks where we release each block, and tries to connect it where it should go
+ *    it's pretty dense; let's try explaining it
+ *
+ *  Input_________
+ *
+ *    double _x :
+ *    double _y :
+ *
+ *  Output________
+ *
+ *    NONE :
+ *
  */
 
 void bGroup::clickUp(double _x, double _y){
@@ -409,11 +446,24 @@ void bGroup::clickUp(double _x, double _y){
 	base.clickUp();
 }
 
+/*****************************************************************
+ * onIf(int _x,int _y,block t) :: function of bGroup
+ *
+ *  Description:: checks to see if you are over a block holder
+ *
+ *  Input_________
+ *
+ *    int _x :
+ *    int _y :
+ *    block t :
+ *
+ *  Output________
+ *
+ *    int :
+ *
+ */
 
 int bGroup::onIf(int _x,int _y,block t){
-	//-------- some shite about conditional statement blocks, I can't even care right now.
-	//-------- I wrote it and can't care, so I can't imagine you care
-	//-------- Probably checks if you're over a block holder
 	int ret=0;
 	for (unsigned int i=0; i<t.numBlocks.size(); i++) {
 		if((t.numHolder)&&_x>t.x+t.numBlocks[i].x&&_x<t.x+t.numBlocks[i].x+50&&_y>t.y+5&&_y<t.y+35&&t.numBlocks[i].placeHolder)
