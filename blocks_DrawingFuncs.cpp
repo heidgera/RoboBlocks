@@ -16,12 +16,12 @@ void block::drawShadow(){
 	//-------- if a block is a bracket block, draw a big shadow
 	
 	ofSetColor(0, 0, 0,75);
-	if (cond) {
+	if (bConditional) {
 		drawBigBlockShadow(x+5,y+5,w,h,oH);
 	}
 	//-------- if a block is a conditional statement block, draw the rounded block shadow
 	else if(numBlock) {
-		if(grabbed) roundedShadow(x+5,y+5,w,h,h/2,.4);
+		if(bGrabbed) roundedShadow(x+5,y+5,w,h,h/2,.4);
 	}
 	//-------- if it's a normal block, draw a regular block shadow
 	else {
@@ -41,12 +41,12 @@ void block::drawSelected(){
 	//-------- if a block is a bracket block, draw a big shadow
 	
 	ofSetColor(0xF4ED47);
-	if (cond) {
+	if (bConditional) {
 		drawBigBlockShadow(x-5,y-5,w+10,h+10,oH+10);
 	}
 	//-------- if a block is a conditional statement block, draw the rounded block shadow
 	else if(numBlock) {
-		if(grabbed) roundedShadow(x-5,y-5,w+10,h+10,(h+10)/2,.4);
+		if(bGrabbed) roundedShadow(x-5,y-5,w+10,h+10,(h+10)/2,.4);
 	}
 	//-------- if it's a normal block, draw a regular block shadow
 	else {
@@ -118,7 +118,7 @@ void block::draw(bool fade){
 	if(vert){
 		//-------- we set the color of the block and draw the shape depending on type
 		ofSetColor(color);
-		if (cond) drawBigBlock(x,y,w,h,oH);
+		if (bConditional) drawBigBlock(x,y,w,h,oH);
 		else if(numBlock) ofRoundBox(x,y,w,h,h/4*vert);
 		else if(bBase) drawBaseBlock(x, y, w, h);
 		else drawBlock(x,y,w,h);
@@ -163,12 +163,12 @@ void block::draw(bool fade){
 	drawOpenDD();
 	if(fade){
 		ofSetColor(255, 255, 255,75);
-		if (cond) {
+		if (bConditional) {
 			drawBigBlockShadow(x,y,w,h,oH);
 		}
 		//-------- if a block is a conditional statement block, draw the rounded block shadow
 		else if(numBlock) {
-			if(grabbed) roundedShadow(x,y,w,h,h/2,.4);
+			if(bGrabbed) roundedShadow(x,y,w,h,h/2,.4);
 		}
 		//-------- if it's a normal block, draw a regular block shadow
 		else {
@@ -182,7 +182,7 @@ void block::draw(bool fade){
 
 void bGroup::drawIndicators(block & grab, block & k)
 {
-	//-------- Display the linking indicators when the blocks are hovering, drawn is to keep track if an indicator has been drawn
+	/*//-------- Display the linking indicators when the blocks are hovering, drawn is to keep track if an indicator has been drawn
 	bool bDrawn=false;
 	int num=0;
 	ofSetColor(0x00ccff);
@@ -211,7 +211,13 @@ void bGroup::drawIndicators(block & grab, block & k)
 		for (unsigned int i=0; i<k.size(); i++) {
 			drawIndicators(grab, k.blocksOn[i]);
 		}
-	}
+	}*/
+  dropBlock db=underWhich(k, grab);
+  if(db.found()){
+    ofSetColor(255, 255, 255);
+    if((*db.inThis).size())
+      ofRect((*db.inThis)[db.index].x, (*db.inThis)[db.index].y+(*db.inThis)[db.index].h, grab.w, 10);
+  }
 }
 
 void bGroup::drawBase(int _x, int _y)
@@ -224,7 +230,7 @@ void bGroup::drawBase(int _x, int _y)
 void bGroup::draw(){
 	//-------- if the blocks are not grabbed, and the dds are not open, draw the blocks
 	for (unsigned int i=0; i<size(); i++) {
-		if (!blocks[i].grabbed&&!blocks[i].ddOpen) {
+		if (!blocks[i].bGrabbed&&!blocks[i].ddOpen) {
 			blocks[i].draw();
 		}
 	}
@@ -235,26 +241,30 @@ void bGroup::drawForeground(){
 	//******** if a block is currently being held, draw it on different layers, depending on Circumstances
 	//-------- draw all the shadows
 	for (unsigned int i=0; i<blocks.size(); i++) {
-		if (blocks[i].grabbed) {
+		if (blocks[i].bGrabbed) {
 			blocks[i].drawShadow();
 		}
 	}
 	//-------- draw all the grabbed blocks
 	for (unsigned int i=0; i<blocks.size(); i++) {
-		if (blocks[i].grabbed) {
+		if (blocks[i].bGrabbed) {
 			blocks[i].draw();
 		}
 	}
+  if(held.bGrabbed){
+    held.drawShadow();
+    held.draw();
+  }
 	
 	//-------- draw ungrabbed statement blocks
 	for (unsigned int i=0; i<blocks.size(); i++) {
-		if (blocks[i].numBlock&&!blocks[i].grabbed) {
+		if (blocks[i].numBlock&&!blocks[i].bGrabbed) {
 			blocks[i].draw();
 		}
 	}
 	//-------- draw grabbed statement blocks
 	for (unsigned int i=0; i<blocks.size(); i++) {
-		if (blocks[i].numBlock&&blocks[i].grabbed) {
+		if (blocks[i].numBlock&&blocks[i].bGrabbed) {
 			blocks[i].draw();
 		}
 	}
@@ -266,7 +276,7 @@ void bGroup::drawForeground(){
 		}
 	}
   for (unsigned int i=0; i<size(); i++) {
-		if(inHand&&blocks[i].grabbed){
+		if(inHand&&blocks[i].bGrabbed){
 			for (unsigned int j=0; j<blocks.size(); j++){
 				drawIndicators(blocks[i],blocks[j]);
 				int pos=0;
@@ -279,8 +289,11 @@ void bGroup::drawForeground(){
 		}
 	}
   for (unsigned int i=0; i<size(); i++) {
-		if(inHand&&blocks[i].grabbed){
-			drawIndicators(blocks[i], base);
+		if(inHand&&held.bGrabbed){
+      drawIndicators(held,blocks[i]);
 		}
 	}
+  if(inHand&&held.bGrabbed){
+    drawIndicators(held, base);
+  }
 }

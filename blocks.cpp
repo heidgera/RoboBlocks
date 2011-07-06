@@ -64,7 +64,7 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
 	//cout << title << endl;
 	
 	//-------- init some variables, to prevent garbage from happening
-	cond=0;
+	bConditional=0;
 	numBlock=ddOpen=deleteMe=false;
 	titleDisp=10;
 	y=_y;
@@ -96,7 +96,7 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
           break;
         case 1: //-- cond
           //-------- set cond=true, and change size
-          cond=atoi(node[1].c_str());
+          bConditional=atoi(node[1].c_str());
           h=105;
           w=200;
           titleDisp=30;
@@ -152,11 +152,12 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
 	}
   h0=h;
   w0=w;
-  if(cond){
+  if(bConditional){
     xIn0=20;
     yIn0=40;
     hIn0=45;
   }
+  else xIn0=yIn0=hIn0=0;
 	int ddNum=0;
 	
 	//-------- assign a default value to the xdis of each dd
@@ -321,8 +322,8 @@ void block::operator=(const block &t) {
 	oH=t.oH;
 	numBlock=t.numBlock;
 	typ=t.typ;
-	cond=t.cond;
-	grabbed=t.grabbed;
+	bConditional=t.bConditional;
+	bGrabbed=t.bGrabbed;
 	title =t.title;
 	filename=t.filename;
 	numBlocks=t.numBlocks;
@@ -359,12 +360,17 @@ void block::operator=(const block &t) {
 void block::setup(double _w, double _h)
 {
 	w=_w, h=oH=_h;
+  w0=w;
+  h0=h;
+  hIn0=0;
+  yIn0=0;
+  xIn0=0;
 	arialHeader.loadFont("DinC.ttf");
 	arialHeader.setSize(20);
 	//title="to program, connect blocks here";
 	//title="connect blocks here and press button";
   title="";
-	cond=0;
+	bConditional=0;
 	w=max(w,double(arialHeader.stringWidth(title)+20));
 	numBlock=ddOpen=deleteMe=false;
 	titleDisp=10;
@@ -449,7 +455,7 @@ void block::updatePositions(block & t){
 	if(blocksIn.size()&&!bSeq&&blockIsInside(t)==1&&!blocksIn[0].onInside(t.x, t.y)) blocksIn[0].move(x+xIn0,y+yIn0-5+t.h+t.heightOnlyOn()),blocksIn[0].updatePositions(t);
 	else if(blocksIn.size()) blocksIn[0].move(x+xIn0,y+yIn0),blocksIn[0].updatePositions(t);
 	for (unsigned int i=1; i<blocksIn.size()&&blocksIn.size()>1; i++) {
-		if(blockIsInside(t)-1==i&&!bSeq&&!blocksIn[i-1].onInside(t.x, t.y)&&!blocksIn[i].cond) 
+		if(blockIsInside(t)-1==i&&!bSeq&&!blocksIn[i-1].onInside(t.x, t.y)&&!blocksIn[i].bConditional) 
 			blocksIn[i].move(blocksIn[i-1].x,blocksIn[i-1].y+blocksIn[i-1].h+t.h+t.heightOnlyOn()-10);
 		else blocksIn[i].move(blocksIn[i-1].x,blocksIn[i-1].y+blocksIn[i-1].h-5);
 		blocksIn[i].updatePositions(t);
@@ -457,7 +463,7 @@ void block::updatePositions(block & t){
 	if(blocksOn.size()&&!bSeq&&blockIsBelow(t)==1) blocksOn[0].move(x,y+h-5),blocksOn[0].updatePositions(t);
 	else if(blocksOn.size()) blocksOn[0].move(x,y+h-5),blocksOn[0].updatePositions(t);
 	for (unsigned int i=1; i<blocksOn.size()&&blocksOn.size()>1; i++) {
-		if(blocksOn[i-1].blockIsBelow(t)==1&&!bSeq&&!blocksOn[i-1].onInside(t.x, t.y)&&!blocksOn[i].cond) {
+		if(blocksOn[i-1].blockIsBelow(t)==1&&!bSeq&&!blocksOn[i-1].onInside(t.x, t.y)&&!blocksOn[i].bConditional) {
 			blocksOn[i].move(blocksOn[i-1].x,blocksOn[i-1].y+blocksOn[i-1].h+t.h+t.heightOnlyOn()-5);
 		}
 		else blocksOn[i].move(blocksOn[i-1].x,blocksOn[i-1].y+blocksOn[i-1].h-5);
@@ -487,7 +493,7 @@ void block::updatePositions(block & t){
 int block::heightOnlyOn(bool moving){
 	int ret=0;
 	for (unsigned int i=0; i<blocksOn.size(); i++) {
-		if(blocksOn[i].cond&&!moving) blocksOn[i].updateSize();
+		if(blocksOn[i].bConditional&&!moving) blocksOn[i].updateSize();
 		ret+=blocksOn[i].h-5;
 	}
 	return ret;
@@ -511,11 +517,11 @@ int block::heightOnlyOn(bool moving){
 
 int block::heightInside(){
 	int ret=0;
-	if(blocksIn.size()&&cond)
+	if(blocksIn.size()&&bConditional)
 		for (unsigned int i=0; i<blocksIn.size(); i++) {
 			ret+=blocksIn[i].h-5;
 		}
-	else if (cond&&blocksIn.size()==0) {
+	else if (bConditional&&blocksIn.size()==0) {
 		ret=oH-65;
 	}
 	return ret;
@@ -577,7 +583,7 @@ bool block::updateSize(int k)
 	for (unsigned int i=0; i<blocksOn.size(); i++) {
 		blocksOn[i].updateSize();
 	}
-	if(cond&&heightInside()+65!=h) h=heightInside()+65,ret=true;
+	if(bConditional&&heightInside()+65!=h) h=heightInside()+65,ret=true;
 	return ret;
 }
 
@@ -602,7 +608,7 @@ void block::addOn(block t,int pos=0){
 	vector<block> k=t.passBlocks(OF_BLOCK_ON, 0);
 	blocksOn.insert(blocksOn.begin()+pos,block(t));
 	blocksOn.insert(blocksOn.begin()+pos+1,k.begin(),k.end());
-	blocksOn[pos].grabbed=false;
+	blocksOn[pos].bGrabbed=false;
 }
 
 bool block::below(int _x,int _y,int dispx, int dispy){
@@ -622,11 +628,11 @@ int block::blockIsBelow(block t)
 }
 
 bool block::onInside(int _x,int _y,int dispx, int dispy){
-	return cond&&((_x>x&&_x<x+w)||((_x+75)>x&&(_x+75)<x+w))&&(_y>y+20&&_y<y+h-10);
+	return bConditional&&((_x>x&&_x<x+w)||((_x+75)>x&&(_x+75)<x+w))&&(_y>y+20&&_y<y+h-10);
 }
 
 bool block::clickInside(int _x,int _y){
-	return cond&&((_x>x+20&&_x<x+w))&&(_y>y+40&&_y<y+h-20);
+	return bConditional&&((_x>x+20&&_x<x+w))&&(_y>y+40&&_y<y+h-20);
 }
 
 int block::blockIsInside(block t)
@@ -666,7 +672,7 @@ void block::addInside(int i, block t)
 {
 	if(i<blocksIn.size()){
 		int pos=0;
-		if(blocksIn[i].cond&&(pos=blocksIn[i].blockIsInside(t))){
+		if(blocksIn[i].bConditional&&(pos=blocksIn[i].blockIsInside(t))){
 			blocksIn[i].addInside(pos-1,t);
 		}
 		else {
@@ -679,7 +685,7 @@ void block::addInside(int i, block t)
 void block::addInside(block & check, block grab, int i)
 {
 	int pos=0;
-	if(check.cond&&(pos=check.blockIsInside(grab))){
+	if(check.bConditional&&(pos=check.blockIsInside(grab))){
 		check.addInside(check.blocksIn[pos-1],grab,pos-1);
 	}
 	else {
@@ -692,7 +698,7 @@ void block::addIn(block t,int pos){
 	vector<block> k=t.passBlocks(OF_BLOCK_ON, 0);
 	blocksIn.insert(blocksIn.begin()+pos,block(t));
 	blocksIn.insert(blocksIn.begin()+pos+1,k.begin(),k.end());
-	blocksIn[pos].grabbed=false;
+	blocksIn[pos].bGrabbed=false;
 }
 
 
@@ -723,7 +729,7 @@ bGroup::bGroup(double _x, double _y,double wid,double hgt):ofInterObj(_x,_y,wid,
  */
 
 bGroup::bGroup():ofInterObj(){
-	grabbed=inHand=ddopen=0;
+	bGrabbed=inHand=ddopen=0;
 }
 
 bGroup::~bGroup(){
@@ -734,12 +740,13 @@ bGroup::~bGroup(){
 
 void bGroup::setup(double _x, double _y,double wid,double hgt){
 	//blocks.reserve(100);
-	grabbed=inHand=ddopen=false;
+	bGrabbed=inHand=ddopen=false;
 	cSetup(_x,_y,wid,hgt);
 	used[""]=false;
   base.setup(530, 90);
 	base.blocksOn.reserve(100);
 	states.recordState(storageState(blocks,base));
+  held.setup(0,0);
 }
 
 int bGroup::size(){
@@ -809,7 +816,7 @@ void bGroup::addFromSB(block t,int _x,int _y){
 		if(numBlocks<99){
 			blocks.push_back(t);
 			used[t.title]=false;
-			blocks[numBlocks].grabbed=grabbed=inHand=true;
+			blocks[numBlocks].bGrabbed=bGrabbed=inHand=true;
 			dispx = blocks[numBlocks].x-_x;
 			dispy = blocks[numBlocks].y-_y;
 		}
@@ -874,7 +881,7 @@ void bGroup::update()
 	base.updatePositions();
 	
 	for (unsigned int i=0; i<blocks.size(); i++) {
-		if(inHand&&blocks[i].grabbed){
+		if(inHand&&blocks[i].bGrabbed){
 			for (unsigned int j=0; j<blocks.size(); j++) {
 				if(i!=j) heightUpdate(blocks[i], blocks[j]);
 				if(blocks[i].onInside(blocks[j].x,blocks[j].y)&&!blocks[j].numBlock&&!blocks[i].inBlockIn(blocks[j].x, blocks[j].y)){

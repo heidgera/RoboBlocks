@@ -76,8 +76,8 @@ bool block::clickDown(int _x, int _y){
 	//-------- checks to see if we are over the block, if we are over a guard position, if there are any dropdowns that
 	//-------- are taking the click, if there is an open dropdown, and if we are inside of a conditional block
 	//-------- if none of these are true except being over the block, then we grab the block
-	grabbed=(over(_x,_y)&&!onBlockNum(_x, _y)&&ddPassingClick(_x,_y)&&!ddSelected&&(!cond||(cond&&clickInside(_x,_y)&&bSeq)||(cond&&!clickInside(_x,_y))));
-	return grabbed;
+	bGrabbed=(over(_x,_y)&&!onBlockNum(_x, _y)&&ddPassingClick(_x,_y)&&!ddSelected&&(!bConditional||(bConditional&&clickInside(_x,_y)&&bSeq)||(bConditional&&!clickInside(_x,_y))));
+	return bGrabbed;
 }
 
 bool block::clickUp(){
@@ -91,8 +91,8 @@ bool block::clickUp(){
 	for (unsigned int i=0; i<blocksOn.size(); i++) {
 		blocksOn[i].clickUp();
 	}
-	grabbed=ddSelected=false;
-	return grabbed;
+	bGrabbed=ddSelected=false;
+	return bGrabbed;
 }
 
 int block::onBlockOn(int _x,int _y){
@@ -188,7 +188,7 @@ void bGroup::blockDown(block & t,int _x,int _y){
 		t.numBlocks[ret-1].xo-=5;
 		t.numBlocks[ret-1].placeHolder=true;
 		used[blocks[cur].title]=false;
-		blocks[cur].grabbed=grabbed=inHand=true;
+		blocks[cur].bGrabbed=bGrabbed=inHand=true;
 		
 		//-------- also, change the anchor point again
 		dispx = blocks[cur].x-_x;
@@ -225,14 +225,20 @@ void bGroup::clickDown(double _x, double _y){
 void bGroup::drag(double _x, double _y){
 	//-------- if we're holding a block, update the position
 	if(inHand){
-		for (unsigned int i=0; i<blocks.size(); i++) {
-			if (blocks[i].grabbed) {
+		/*for (unsigned int i=0; i<blocks.size(); i++) {
+			if (blocks[i].bGrabbed) {
 				blocks[i].move(_x+dispx,_y+dispy);
 				blocks[i].updatePositions();
 			}
-		}
+		}*/
+    if(held.bGrabbed){
+      held.move(_x+dispx, _y+dispy);
+      held.updatePositions();
+    }
 	}
 }
+
+
 
 void bGroup::motion(double _x, double _y){
 	//-------- if we are moving but not clicked, inform the blocks
@@ -305,7 +311,7 @@ int bGroup::handleClickUps(block & grab, block & comp, bool checkOn){
 	int pos=0;
 	//-------- if the i-block is grabbed, and both the i- and j-blocks are not numBlocks check some more
 	//-------- the i-block is the block being released, int this case
-	if(grab.grabbed&&!grab.numBlock&&!comp.numBlock){
+	if(grab.bGrabbed&&!grab.numBlock&&!comp.numBlock){
 		
 		//-------- if the block we are releasing is below the j- block, and it is not inside the j-block
 		if ((pos=comp.blockIsBelow(grab))&&!comp.inBlockOn(grab.x,grab.y)) {
@@ -354,12 +360,12 @@ int bGroup::handleClickUps(block & grab, block & comp, bool checkOn){
 	
 	//******** TODO: expand this section to include guards for catching all problems, actually, it might do that.
 	//-------- if the i-block is a numBlock add to block in or on
-	else if(grab.grabbed&&grab.numBlock&&(pos=comp.overHolderBelow(grab))){
+	else if(grab.bGrabbed&&grab.numBlock&&(pos=comp.overHolderBelow(grab))){
 		if(pos==1) addNum(comp, grab);
 		else if(pos>1) addNum(comp.blocksOn[pos-2], grab);
 		ret=2;
 	}
-	else if(grab.grabbed&&grab.numBlock&&(pos=comp.overHolderInside(grab))){
+	else if(grab.bGrabbed&&grab.numBlock&&(pos=comp.overHolderInside(grab))){
 		if(pos==1) addNum(comp, grab);
 		else if(pos>1) addNum(comp.blocksIn[pos-2], grab);
 		ret=2;
@@ -387,7 +393,7 @@ int bGroup::handleClickUps(block & grab, block & comp, bool checkOn){
 void bGroup::clickUp(double _x, double _y){
 	for(int i=0; i<blocks.size(); i++){
 		//-------- if a block is grabbed, set the lastBlock parameter to it's position in the vector
-		if(blocks[i].grabbed){
+		if(blocks[i].bGrabbed){
 			lastBlock=i;
 			handleClickUps(blocks[i], base,false);
 		}
@@ -401,15 +407,15 @@ void bGroup::clickUp(double _x, double _y){
 		}
 		
 		//-------- if we dropped the block outside the checking area, flag for deleting
-		if (blocks[i].grabbed&&(blocks[i].x<x-15||blocks[i].x>x+w||blocks[i].y<y||blocks[i].y>y+h)) {
-			blocks[i].grabbed=inHand=ddopen=false;
+		if (blocks[i].bGrabbed&&(blocks[i].x<x-15||blocks[i].x>x+w||blocks[i].y<y||blocks[i].y>y+h)) {
+			blocks[i].bGrabbed=inHand=ddopen=false;
 			blocks[i].deleteMe=true;
 		}
 		
 		//-------- if a block was grabbed, let it go and set the grabbed flag, for state saving
-		if(blocks[i].grabbed){
-			blocks[i].grabbed=inHand=false;
-			grabbed=true;
+		if(blocks[i].bGrabbed){
+			blocks[i].bGrabbed=inHand=false;
+			bGrabbed=true;
 		}
 	}
 	
@@ -431,8 +437,8 @@ void bGroup::clickUp(double _x, double _y){
 		}
 	}
 	//-------- if we just were grabbing a block, delete that shit
-	if (grabbed) {
-		grabbed=false;
+	if (bGrabbed) {
+		bGrabbed=false;
 		recordState();
 	}
 	base.clickUp();

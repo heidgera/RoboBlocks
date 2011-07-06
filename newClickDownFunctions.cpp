@@ -12,7 +12,7 @@
 bool block::newClickInside(int _x, int _y)
 {
   bool ret=false;
-  if(bConditional&&_x>x+xIn0&&_x<x+w-xIn0&&_y>y+yIn0&&_y<y+yIn0+hIn0) ret=true;
+  if(bConditional&&_x>x+xIn0&&_x<x+w-xIn0&&_y>y+yIn0&&_y<y+yIn0+h) ret=true;
   return ret;
 }
 
@@ -49,7 +49,10 @@ bool bGroup::newClickDown(int _x, int _y)
 {
   bool ret=false;
   for (unsigned int i=0; i<blocks.size()&&!ret; i++) {
-    ret=newHandleClick(blocks,i,_x,_y,true);
+    inHand=ret=newHandleClick(blocks,i,_x,_y,true);
+  }
+  for (unsigned int i=0; i<base.blocksOn.size()&&!ret; i++) {
+    inHand=ret=newHandleClick(base.blocksOn,i,_x,_y);
   }
   return ret;
 }
@@ -61,7 +64,7 @@ bool bGroup::newHandleClick(vector<block> & chk, int i, int _x, int _y, bool top
     if(chk[i].newClickDD(_x,_y,ddopen))
       ret=true;
   }
-  else if(chk[i].newClickDown(_x,_y)&&!ddopen){
+  else if(!ret&&chk[i].newClickDown(_x,_y)&&!ddopen){
     ret=true;
     dispx = chk[i].x-_x;
     dispy = chk[i].y-_y;
@@ -69,13 +72,14 @@ bool bGroup::newHandleClick(vector<block> & chk, int i, int _x, int _y, bool top
     else held = chk[i],chk.erase(chk.begin()+i);
   }
   else {
-    for (unsigned int i=0; i<chk[i].blocksIn.size()&&!ret; i++) {
-      ret=newHandleClick(chk[i].blocksIn,i,_x,_y);
+    for (unsigned int j=0; j<chk[i].blocksIn.size()&&!ret; j++) {
+      ret=newHandleClick(chk[i].blocksIn,j,_x,_y,false);
     }
-    for (unsigned int i=0; i<chk[i].blocksOn.size()&&!ret; i++) {
-      ret=newHandleClick(chk[i].blocksOn,i,_x,_y);
+    for (unsigned int j=0; j<chk[i].blocksOn.size()&&!ret; j++) {
+      ret=newHandleClick(chk[i].blocksOn,j,_x,_y,false);
     }
   }
+  return ret;
 }
 
 void bGroup::pullBlocks(vector<block> & chk, int i)

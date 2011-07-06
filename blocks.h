@@ -26,7 +26,7 @@
 
 //************ type for different kinds of blocks *********
 enum ofBlockType {
-	OF_BLOCK_ON,OF_BLOCK_IN,OF_BLOCK_NUM
+	OF_BLOCK_NULL,OF_BLOCK_ON,OF_BLOCK_IN,OF_BLOCK_NUM
 };
 
 /*****************************************************************
@@ -204,9 +204,17 @@ public:
   
   void newUpdatePositions(block * held=0);
   
-  bool newBelow(block & t);
+  int newBelow(block & t);
   
-  bool newInside(block & t);
+  bool beneath(block & blockToCheck, int spaceBelow=0);
+  
+  int newInside(block & t);
+  
+  bool inBounds(int xX, int yX, int wX, int hX);
+  
+  int insideDropzone(block & blockToCheck);
+  
+  int onDropzone(block & blockToCheck);
   
   bool newClickInside(int _x, int _y);
   
@@ -217,6 +225,27 @@ public:
   block separateBlock(ofBlockType bType, int index);
   
 };
+                 
+struct dropBlock {
+  int index;
+  bool bFound;
+  block * belowThis;
+  vector<block> * inThis;
+  ofBlockType whichVector;
+  dropBlock(){ inThis=0,index=bFound=belowThis=0,whichVector=OF_BLOCK_NULL; }
+  dropBlock(block & thisBlock, ofBlockType type, int atThisPos){ set(thisBlock,type,atThisPos); }
+  void set(block & thisBlock, ofBlockType type, int atThisPos){
+    bFound=true;
+    index=atThisPos;
+    belowThis=&thisBlock;
+    whichVector=type;
+    if(type==OF_BLOCK_ON) inThis=&(thisBlock.blocksOn);
+    else if(type==OF_BLOCK_IN) inThis=&(thisBlock.blocksIn);
+  }
+  bool found() { return bFound; }
+};
+
+dropBlock underWhich(block & startBlock, block & dropped);
 
 /*****************************************************************
  * struct storageState 
@@ -276,7 +305,7 @@ public:
 	block base;
 	clock_t dblClick;
 	int lastBlock;
-	bool grabbed,inHand,ddopen;
+	bool bGrabbed,inHand,ddopen;
 	double dispx, dispy;
 	double placex, placey;
 	bGroup(double x, double y,double wid,double hgt);
@@ -374,6 +403,10 @@ public:
   bool newHandleClickUp(block & grab, block & chk);
   
   bool newHandleClick(vector<block> & chk, int indx, int _x, int _y, bool top=false);
+  
+  bool processBlockDrop(block & drop,block & target);
+  
+  bool pushBlocks(block & dropped, vector<block> & into, int i, bool top=false);
   
   void pullBlocks(vector<block> & chk, int i);
   

@@ -337,8 +337,9 @@ void testApp::mousePressed(int x, int y, int button){
 		objects->clickDown(x, y);
 		
 		//--------- Check the blocks in the comp area
-		blocks.clickDown(x, y);
-		
+		//blocks.clickDown(x, y);
+		blocks.newClickDown(x, y);
+    
 		//--------- Run upload function if the upload button is pressed
 		if(upBut.clickDown(x, y)){
 			upload();
@@ -371,7 +372,7 @@ void testApp::mousePressed(int x, int y, int button){
 void testApp::mouseReleased(int x, int y, int button){
 	if(timeOut.running()&&(!anim.isPlaying()||(anim.isPlaying()&&button==VMOUSE_BUTTON))){
     //--------- do a bunch of clickups
-    blocks.clickUp(x, y);
+    blocks.newClickUp(x, y);
     upBut.clickUp();
     clearBut.clickUp();
     redoBut.clickUp();
