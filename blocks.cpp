@@ -814,11 +814,13 @@ void bGroup::addFromSB(block t,int _x,int _y){
 	if(t.over(_x,_y)||t.onBlockOn(_x, _y)&&!inHand){
 		int numBlocks=size();
 		if(numBlocks<99){
-			blocks.push_back(t);
+			//blocks.push_back(t);
 			used[t.title]=false;
-			blocks[numBlocks].bGrabbed=bGrabbed=inHand=true;
-			dispx = blocks[numBlocks].x-_x;
-			dispy = blocks[numBlocks].y-_y;
+      held=t;
+      held.bGrabbed=bGrabbed=inHand=true;
+			//blocks[numBlocks].bGrabbed=bGrabbed=inHand=true;
+			dispx = held.x-_x;
+			dispy = held.y-_y;
 		}
 		else {
 			printf("Remove some blocks, doncha know.");

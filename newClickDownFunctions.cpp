@@ -49,10 +49,10 @@ bool bGroup::newClickDown(int _x, int _y)
 {
   bool ret=false;
   for (unsigned int i=0; i<blocks.size()&&!ret; i++) {
-    inHand=ret=newHandleClick(blocks,i,_x,_y,true);
+    if(!ret) ret=newHandleClick(blocks,i,_x,_y,true);
   }
   for (unsigned int i=0; i<base.blocksOn.size()&&!ret; i++) {
-    inHand=ret=newHandleClick(base.blocksOn,i,_x,_y);
+    if(!ret) ret=newHandleClick(base.blocksOn,i,_x,_y);
   }
   return ret;
 }
@@ -61,11 +61,13 @@ bool bGroup::newHandleClick(vector<block> & chk, int i, int _x, int _y, bool top
 {
   bool ret=false;
   if(!chk[i].ddPassingClick(_x,_y)){
+    cout << "the dropdown took the click" << endl;
     if(chk[i].newClickDD(_x,_y,ddopen))
       ret=true;
   }
   else if(!ret&&chk[i].newClickDown(_x,_y)&&!ddopen){
-    ret=true;
+    cout << "We got into the block clickdown check" << endl;
+    inHand=ret=true;
     dispx = chk[i].x-_x;
     dispy = chk[i].y-_y;
     if(!top) pullBlocks(chk, i);
@@ -73,10 +75,10 @@ bool bGroup::newHandleClick(vector<block> & chk, int i, int _x, int _y, bool top
   }
   else {
     for (unsigned int j=0; j<chk[i].blocksIn.size()&&!ret; j++) {
-      ret=newHandleClick(chk[i].blocksIn,j,_x,_y,false);
+      if(!ret) ret=newHandleClick(chk[i].blocksIn,j,_x,_y,false);
     }
     for (unsigned int j=0; j<chk[i].blocksOn.size()&&!ret; j++) {
-      ret=newHandleClick(chk[i].blocksOn,j,_x,_y,false);
+      if(!ret)ret=newHandleClick(chk[i].blocksOn,j,_x,_y,false);
     }
   }
   return ret;

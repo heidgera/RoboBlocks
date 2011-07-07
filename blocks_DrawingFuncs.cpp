@@ -215,8 +215,19 @@ void bGroup::drawIndicators(block & grab, block & k)
   dropBlock db=underWhich(k, grab);
   if(db.found()){
     ofSetColor(255, 255, 255);
-    if((*db.inThis).size())
-      ofRect((*db.inThis)[db.index].x, (*db.inThis)[db.index].y+(*db.inThis)[db.index].h, grab.w, 10);
+    if((*db.inThis).size()){
+      if(db.index){
+        block & t=(*db.inThis)[db.index-1];
+        ofRect(t.x+5, t.y+t.h, t.w-10, 10);
+      }
+      else {
+        block & t=*(db.belowThis);
+        if(t.bConditional)
+          ofRect(t.x+t.xIn0+5, t.y+t.yIn0, t.w-t.xIn0-10, 10);
+        else
+          ofRect(t.x+5, t.y+t.h, t.w-10, 10);
+      }
+    }
   }
 }
 

@@ -222,6 +222,8 @@ public:
   
   bool newClickDown(int x, int y);
   
+  bool newClickUp(int _x, int _y);
+  
   block separateBlock(ofBlockType bType, int index);
   
 };
