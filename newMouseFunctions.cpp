@@ -53,10 +53,8 @@ int block::newBelow(block & t)
     midLine=y+h/2;
     cH+=h/2-midLine;
   }
-  ofSetColor(255,255,255,64);
   if(t.inBounds(x, midLine, w, cH))
-    ret=true,ofSetColor(255,255,255,128);
-  ofRect(x, midLine, w, cH);
+    ret=true;
   return ret;
 }
 
@@ -67,10 +65,8 @@ int block::newInside(block & drop)
     int inLine=y+yIn0/2;
     int bottomSpace=h0-(yIn0+hIn0);
     int inH=yIn0/2+h-(yIn0+bottomSpace);
-    ofSetColor(0,0,0,64);
     if(drop.inBounds(x+xIn0, inLine, w-xIn0, inH))
-      ret=true,ofSetColor(0,0,0,128);
-    ofRect(x+xIn0, inLine, w-xIn0, inH);
+      ret=true;
   }
   return ret;
 }
@@ -116,46 +112,47 @@ bool block::newClickUp(int _x, int _y)
 bool searchUnderBlock(dropBlock & foundBlock,block & strt, block & drpd, ofBlockType t)
 {
   bool tmp=0;
-  vector<block> bV;
+  vector<block> * blck;
   
   //------- select which vector to examine
-  if(t==OF_BLOCK_IN) bV=strt.blocksIn;
-  else bV=strt.blocksOn;
+  if(t==OF_BLOCK_IN) blck=&strt.blocksIn;
+  else blck=&strt.blocksOn;
+  
+  vector<block> & bV=*blck;
   
   //------- iterate through the vector
   int spc=0;
   if(bV.size()) spc=((bV[0].bConditional)?bV[0].yIn0/2:bV[0].h/2);
   else spc=((strt.bConditional)?strt.yIn0/2:strt.h/2);
 
-  if(!strt.bConditional){
-    if (strt.beneath(drpd,spc)) {
-      tmp=true;
-      foundBlock.set(strt,t,0);
+  if(!foundBlock.found()){
+    if(!strt.bConditional||t==OF_BLOCK_ON){
+      if (strt.beneath(drpd,spc)) {
+        tmp=true;
+        foundBlock.set(strt,t,0);
+      }
     }
-  }
-  else {
-    if (drpd.inBounds(strt.x+strt.xIn0,strt.y+strt.yIn0/2, strt.w-strt.xIn0, strt.yIn0/2+spc)) {
-      ofSetColor(255, 0, 0,128);
-      ofRect(strt.x+strt.xIn0,strt.y+strt.yIn0/2, strt.w-strt.xIn0, strt.yIn0/2+spc);
-      tmp=true;
-      foundBlock.set(strt,t,0);
+    else {
+      if (drpd.inBounds(strt.x+strt.xIn0,strt.y+strt.yIn0/2, strt.w-strt.xIn0, strt.yIn0/2+spc)) {
+        tmp=true;
+        foundBlock.set(strt,t,0);
+      }
     }
-  }
-    
-  
-  for (unsigned int i=0; i<bV.size()&&!tmp; i++) {
-    block * nxt=0;
-    spc=bV[i].h/2;
-    if(bV[i].bConditional) spc=bV[i].yIn0/2;
-    //------- find the halfway point on the next block
-    if(i<bV.size()-1) nxt=&(bV[i+1]);
-    if(nxt) spc=((nxt->bConditional)?nxt->yIn0/2:nxt->h/2);
-    if (bV[i].beneath(drpd,spc)&&!bV[i].newInside(drpd)) {
-      tmp=true;
-      foundBlock.set(strt,t,i+1);
-    }
-    else if(bV[i].newInside(drpd)){
-      tmp=searchUnderBlock(foundBlock,bV[i],drpd,OF_BLOCK_IN);
+      
+    for (unsigned int i=0; i<bV.size()&&!tmp; i++) {
+      block * nxt=0;
+      spc=bV[i].h/2;
+      if(bV[i].bConditional) spc=bV[i].yIn0/2;
+      //------- find the halfway point on the next block
+      if(i<bV.size()-1) nxt=&(bV[i+1]);
+      if(nxt) spc=((nxt->bConditional)?nxt->yIn0/2:nxt->h/2);
+      if (bV[i].beneath(drpd,spc)&&!bV[i].newInside(drpd)) {
+        tmp=true;
+        foundBlock.set(strt,t,i+1);
+      }
+      else if(bV[i].newInside(drpd)){
+        tmp=searchUnderBlock(foundBlock,bV[i],drpd,OF_BLOCK_IN);
+      }
     }
   }
   return tmp;
@@ -171,6 +168,7 @@ dropBlock underWhich(block & strt, block & drpd)
   else if(!tmp&&strt.newBelow(drpd)){
     tmp=searchUnderBlock(ret,strt,drpd,OF_BLOCK_ON);
   }
+  
   return ret;
 }
 
@@ -189,6 +187,8 @@ bool bGroup::newClickUp(int _x, int _y)
       if(processBlockDrop(held, base)) ret=true;
       for (unsigned int i=0; i<blocks.size()&&!ret; i++){
         ret=processBlockDrop(held, blocks[i]);
+        if(!ret && (ret=processBlockDrop(blocks[i],held,true)))
+          blocks.erase(blocks.begin()+i),i--;
       }
       if(!ret) pushBlocks(held, blocks, blocks.size(),true);
     }
@@ -197,14 +197,22 @@ bool bGroup::newClickUp(int _x, int _y)
   return ret;
 }
 
-bool bGroup::processBlockDrop(block & drop,block & t)
+bool bGroup::processBlockDrop(block & drop,block & target,bool reverse)
 {
   bool ret=0;
   dropBlock fnd;
-  fnd=underWhich(t, drop);
+  fnd=underWhich(target, drop);
   if(fnd.found()){
-    ret=true;
-    pushBlocks(drop, *fnd.inThis, fnd.index);
+    if(!reverse){
+      ret=true;
+      pushBlocks(drop, *fnd.inThis, fnd.index);
+    }
+    else if(fnd.index==fnd.inThis->size()){
+      pushBlocks(drop, *fnd.inThis, fnd.index);
+      int pos=blocks.size();
+      pushBlocks(target, blocks, pos,true);
+      ret=true;
+    }
   }
   return ret;
 }
@@ -217,11 +225,7 @@ bool bGroup::pushBlocks(block & dropped, vector<block> & into, int i, bool top)
     vector<block> k=dropped.blocksOn;
     dropped.blocksOn.clear();
     into.insert(into.begin()+i,dropped);
-    into.insert(into.begin()+i+1,k.begin(),k.end());
+    if(k.size()) into.insert(into.begin()+i+1,k.begin(),k.end());
   }
 }
 
-bool bGroup::newHandleClickUp(block & grab, block & chk)
-{
-
-}

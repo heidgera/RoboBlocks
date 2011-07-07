@@ -406,7 +406,7 @@ public:
   
   bool newHandleClick(vector<block> & chk, int indx, int _x, int _y, bool top=false);
   
-  bool processBlockDrop(block & drop,block & target);
+  bool processBlockDrop(block & drop,block & target, bool reverse=false);
   
   bool pushBlocks(block & dropped, vector<block> & into, int i, bool top=false);
   
