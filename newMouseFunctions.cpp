@@ -10,6 +10,24 @@
 
 #include "blocks.h"
 
+/*****************************************************************
+ * newClickUp(int _x, int _y) :: function of block
+ *
+ *  Description:: mouse release function for the individual blocks;
+ *    resets the bGrabbed member, and wipes selection vars of the dropdowns
+ *    Also wipes all of the blocks below.
+ *
+ *  Input_________
+ *
+ *    int _x : x position of the mouse at click up
+ *     int _y : y position   "        "        "
+ *
+ *  Output________
+ *
+ *    bool : false, always false. No point really
+ *
+ */
+
 bool block::newClickUp(int _x, int _y)
 {
   for (unsigned int j=0; j<ddGroup.size(); j++) {
@@ -22,9 +40,29 @@ bool block::newClickUp(int _x, int _y)
   for (unsigned int i=0; i<blocksOn.size(); i++) {
     blocksOn[i].newClickUp(_x,_y);
   }
+  return false;
 }
 
 //******************************** Individual functions **********************
+
+/*****************************************************************
+ * searchUnderBlock() 
+ *
+ *  Description:: function to find which vector and block the "held" block is under
+ *
+ *
+ *  Input_________
+ *
+ *    dropBlock & foundBlock : a reference to the dropBlock container which holds the info for the block, if found.
+ *    block & strt : a reference to the block under which we begin searching.
+ *     block & drpd : reference to the held block
+ *     ofBlockType t : tells us if we are looking in the blockIn or blocksOn vector.
+ *
+ *  Output________
+ *
+ *    bool : true if we find a block which is above the held block in the specified vector, false otherwise.
+ *
+ */
 
 bool searchUnderBlock(dropBlock & foundBlock,block & strt, block & drpd, ofBlockType t)
 {
@@ -37,25 +75,32 @@ bool searchUnderBlock(dropBlock & foundBlock,block & strt, block & drpd, ofBlock
   
   vector<block> & bV=*blck;
   
-  //------- iterate through the vector
+  //------- set the space under the strt block which we check for the drpd block.
   int spc=0;
   if(bV.size()) spc=((bV[0].bConditional)?bV[0].yIn0/2:bV[0].h/2);
   else spc=((strt.bConditional)?strt.yIn0/2:strt.h/2);
 
+  //------- if we have not yet found a block under which the drpd block could be found
   if(!foundBlock.found()){
+    
+    //------- check directly under the strt block, if we're checking the blocksOn
     if(!strt.bConditional||t==OF_BLOCK_ON){
       if (strt.beneath(drpd,spc)) {
+        //------- if it was there, set the foundBlock var to the 0 position of the vector
         tmp=true;
         foundBlock.set(strt,t,0);
       }
     }
+    //------- if we're checking blocksIn, check immediately inside
     else {
       if (drpd.inBounds(strt.x+strt.xIn0,strt.y+strt.yIn0/2, strt.w-strt.xIn0, strt.yIn0/2+spc)) {
         tmp=true;
+        //------- set the foundBlock to the 0 Position of the vector
         foundBlock.set(strt,t,0);
       }
     }
       
+    //------- if we did not find the drpd block under the strt block immediately, iterate through the vector
     for (unsigned int i=0; i<bV.size()&&!tmp; i++) {
       block * nxt=0;
       spc=bV[i].h/2;
