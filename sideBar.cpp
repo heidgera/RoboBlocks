@@ -174,7 +174,7 @@ void sideBar::draw(int _x, int _y){
 		int temp=y+h+20;
 		for (unsigned int j=0; j<blocks.size(); j++) {
 			blocks[j].draw(20,temp);
-			temp+=blocks[j].h+blocks[j].heightOnlyOn()+20;
+			temp+=blocks[j].h+blocks[j].newHeightOn()+20;
 		}
 	}
 }
@@ -264,18 +264,19 @@ sbGroup::sbGroup(ofXML & xml,bGroup * destin):ofInterObj(){
 			ofColor color(colTrip);
 			//cout << tag[i].getAttribute("name") + " " + tag[i].getLabel() <<endl;
 			unsigned int curBar=bars.size();
-			bars.push_back( sideBar(-20,50+40*i,260,40,tag[i].getAttribute("name"),color));
+      int barHeight=40;
+			bars.push_back( sideBar(0,0,0,barHeight,tag[i].getAttribute("name"),color));
 			for (unsigned int j=0; j<tag[i].size(); j++) {
 				if (tag[i][j].getLabel()=="block") {
           int curBlock=bars[curBar].blocks.size();
 					bars[curBar].blocks.push_back(block(tag[i][j],color,j*45));
           bars[curBar].w=max(bars[curBar].w,bars[curBar].blocks[curBlock].fullWidth());
-          w=max(bars[curBar].w+40,w);
+          w=max(bars[curBar].w+barHeight,w);
 				}
 			}
 		}
 	}
-	bars.push_back( sideBar(-20,50+40*bars.size(),260,40,"Filler",ofColor(0,0,0)));
+	bars.push_back( sideBar(0,0,0,40,"Filler",ofColor(0,0,0)));
 	if (bars.size()) {
 		y=bars[0].y;
 		x=0;
@@ -332,13 +333,13 @@ void sbGroup::updateHeight(){
 	for (unsigned int i=0; i<bars.size(); i++) {
 		double hgt=20;
 		for (unsigned int j=0; j<bars[i].size(); j++) {
-			hgt+=bars[i][j].h+bars[i][j].heightOnlyOn()+20;
+			hgt+=bars[i][j].h+bars[i][j].newHeightOn()+20;
 		}
 		maxHeight=max(maxHeight,hgt);
 		maxWid=max(maxWid,bars[i].updateSize());
 	}
 	sideBarSpace=maxHeight;
-	h=sideBarSpace-y+40*(bars.size());
+	h=sideBarSpace+bars[0].h*(bars.size()-1);
 	w=max(w,maxWid);
 	for (unsigned int i=0; i<bars.size(); i++) {
 		bars[i].w=maxWid;
@@ -365,48 +366,9 @@ void sbGroup::update()
 {
 	for (unsigned int i=0; i<bars.size(); i++) {
 		for (unsigned int j=0; j<bars[i].size(); j++) {
-			if(bars[i][j].updateSize())
+			if(bars[i][j].newUpdateHeight())
 				updateHeight();
-			bars[i][j].updatePositions();
-		}
-	}
-}
-
-/*****************************************************************
- * unfold() :: member of sbGroup
- *
- *  Description::
- *
- *
- *  Input_________
- *
- *    NONE :
- *
- *  Output________
- *
- *    NONE :
- *
- */
-
-void sbGroup::unfold(){
-	for (unsigned int i=0; i<bars.size()-1; i++) {
-		int dir;
-		if (bars[i].Open&&bars[i+1].y<bars[i+1].yo+sideBarSpace) {
-			dir = 1;
-		}
-		else if(!bars[i].Open&&bars[i+1].y>bars[i].y+bars[i].h){
-			dir = -1;}
-		else {
-			dir=0;
-		}
-		if(dir){
-			while((bars[i].Open&&bars[i+1].y<bars[i+1].yo+sideBarSpace)||\
-				  (!bars[i].Open&&bars[i+1].y>bars[i].y+bars[i].h))
-				for (unsigned int j=0; j<bars.size(); j++) {
-					if (j>i) {
-						bars[j].y+=dir;
-					}
-				}
+			bars[i][j].newUpdatePositions();
 		}
 	}
 }
@@ -453,7 +415,7 @@ void sbGroup::draw(int _x, int _y)
 
 void sbGroup::draw(){
 	
-	//--------- Draw a brown box onto the sidebar to hold the blocks
+	//--------- Draw a gray box onto the sidebar to hold the blocks
 	//ofSetColor(0x80633B);
 	ofSetColor(0x777777);
 	ofShadeBox(0,y,w-15-25,h,OF_DOWN,.1);

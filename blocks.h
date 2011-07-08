@@ -119,60 +119,12 @@ public:
 	block & lastBlock();
 	
 	block & operator[](int i);
-	
-	int heightOnlyOn(bool moving=false);
-	
-	int heightInside();
   
   double fullWidth();
 	
-	void updateIn();
-	
-	void updateOn();
-	
-	int blockIsOverNum(block & t);
-	
 	int onBlockOn(int x,int y);
 	
-	int onBlockIn(int x,int y);
-	
-	int inBlockIn(int x,int y);
-	
-	int inBlockOn(int x,int y);
-	
-	int onBlockNum(int _x,int _y);
-	
-	void updatePositions();
-	
-	void updatePositions(block & t);
-	
-	bool updateSize(int k=0);
-	
-	bool onInside(int x,int y,int dispx=0, int dispy=0);
-	
-	bool overNum(block & t);
-	
-	int blockIsInside(block t);
-	
-	int overHolderBelow(block t);
-	
-	int overHolderInside(block t);
-	
-	void addInside(int i, block t);
-	
-	void addInside(block & check, block grab, int i);
-	
-	void addOn(block t,int pos);
-	
-	void addBelow(block *,block *);
-	
-	void addIn(block t, int pos=0);
-	
-	bool below(int x,int y,int dispx=0, int dispy=0);
-	
 	bool ddPassingClick(int x, int y);
-	
-	bool clickInside(int x,int y);
 	
 	void motion(int x, int y);
 	
@@ -182,9 +134,9 @@ public:
 	
 	void printData(string part,ofstream* k,int t=0,map<string,bool> * printed=0, bool printIn=true);
 	
-	bool clickDown(int _x, int _y);
+	//bool clickDown(int _x, int _y);
 	
-	bool clickUp();
+	//bool clickUp();
 	
 	bool ddClickDown(int _x, int _y, bool & ddopen, bool inHand);
 	
@@ -196,25 +148,25 @@ public:
   
   bool bGrabbed, bConditional, null;
   
+  int insertSpace;
+  
   int newHeightOn();
   
   int newHeightIn();
   
-  void newUpdateHeight(block * held=0);
+  int effectiveHeight();
   
-  void newUpdatePositions(block * held=0);
+  int newUpdateHeight();
   
-  int newBelow(block & t);
+  void newUpdatePositions();
+  
+  bool newBelow(block & t);
   
   bool beneath(block & blockToCheck, int spaceBelow=0);
   
-  int newInside(block & t);
+  bool newInside(block & t);
   
   bool inBounds(int xX, int yX, int wX, int hX);
-  
-  int insideDropzone(block & blockToCheck);
-  
-  int onDropzone(block & blockToCheck);
   
   bool newClickInside(int _x, int _y);
   

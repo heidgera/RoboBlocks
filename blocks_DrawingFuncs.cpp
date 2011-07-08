@@ -180,52 +180,31 @@ void block::draw(bool fade){
 
 //---------------Group Draw Functions ------------------
 
+void indicate(dropBlock & db)
+{
+  ofSetColor(255, 255, 255);
+  if(db.index){
+    block & t=(*db.inThis)[db.index-1];
+    ofRect(t.x+5, t.y+t.h, t.w-10, 10);
+  }
+  else {
+    block & t=*(db.belowThis);
+    if(db.whichVector==OF_BLOCK_IN)
+      ofRect(t.x+t.xIn0+5, t.y+t.yIn0, t.w-t.xIn0-10, 10);
+    else
+      ofRect(t.x+5, t.y+t.h, t.w-10, 10);
+  }
+}
+
 void bGroup::drawIndicators(block & grab, block & k)
 {
-	/*//-------- Display the linking indicators when the blocks are hovering, drawn is to keep track if an indicator has been drawn
-	bool bDrawn=false;
-	int num=0;
-	ofSetColor(0x00ccff);
-	
-	//-------- if the grabbed block is immediately below the block being checked against (k), draw the white indicator
-	if((k.blockIsBelow(grab)==1)&&!grab.numBlock&&!k.numBlock){
-		ofRect(k.x, k.y+k.h, grab.w, 10);
-		bDrawn=true;
-	}
-	//-------- if the grabbed block is immediately inside of k, draw the indicator inside the block
-	else if(k.blockIsInside(grab)==1&&!k.bSeq&&!k.inBlockIn(grab.x, grab.y)&&!grab.numBlock&&!k.numBlock){
-		ofRect(k.x+25,k.y+45,grab.w,10);
-		bDrawn=true;
-	}
-	//-------- if we're holding a statement block, and over a holder, change color of indicator
-	else if(num=k.blockIsOverNum(grab)){
-		ofSetColor(128, 128, 200);
-		ofRoundBox(k.x+5+k.numBlocks[num-1].xo,k.y+7,k.numBlocks[num-1].w,k.numBlocks[num-1].h,(20/4)); //TODO: real number for y pos
-	}
-	
-	//-------- if we have not drawn an indicator, check blocks in and on
-	if(!bDrawn){
-		for (unsigned int i=0; i<k.numInside(); i++) {
-			if(!k.bSeq) drawIndicators(grab, k.blocksIn[i]);
-		}
-		for (unsigned int i=0; i<k.size(); i++) {
-			drawIndicators(grab, k.blocksOn[i]);
-		}
-	}*/
   dropBlock db=underWhich(k, grab);
   if(db.found()){
-    ofSetColor(255, 255, 255);
-    if(db.index){
-      block & t=(*db.inThis)[db.index-1];
-      ofRect(t.x+5, t.y+t.h, t.w-10, 10);
-    }
-    else {
-      block & t=*(db.belowThis);
-      if(db.whichVector==OF_BLOCK_IN)
-        ofRect(t.x+t.xIn0+5, t.y+t.yIn0, t.w-t.xIn0-10, 10);
-      else
-        ofRect(t.x+5, t.y+t.h, t.w-10, 10);
-    }
+    indicate(db);
+  }
+  db=underWhich(grab, k);
+  if(db.found()&&db.index==db.inThis->size()){
+    indicate(db);
   }
 }
 
@@ -243,7 +222,6 @@ void bGroup::draw(){
 			blocks[i].draw();
 		}
 	}
-	//-------- if there is a block which is grabbed, draw some indicators
 }
 
 void bGroup::drawForeground(){
@@ -260,10 +238,6 @@ void bGroup::drawForeground(){
 			blocks[i].draw();
 		}
 	}
-  if(held.bGrabbed){
-    held.drawShadow();
-    held.draw();
-  }
 	
 	//-------- draw ungrabbed statement blocks
 	for (unsigned int i=0; i<blocks.size(); i++) {
@@ -284,25 +258,18 @@ void bGroup::drawForeground(){
 			blocks[i].draw();
 		}
 	}
-  for (unsigned int i=0; i<size(); i++) {
-		if(inHand&&blocks[i].bGrabbed){
-			for (unsigned int j=0; j<blocks.size(); j++){
-				drawIndicators(blocks[i],blocks[j]);
-				int pos=0;
-				if((pos=blocks[i].blockIsBelow(blocks[j]))&&!blocks[i].numBlock){
-					if(pos==1) drawBox(blocks[i].x,blocks[i].y+blocks[i].h,blocks[j].w,10,1,1,1);
-					else if(pos-2<blocks[i].size()) drawBox(blocks[i].blocksOn[pos-2].x,blocks[i].blocksOn[pos-2].y\
-                                                  +blocks[i].blocksOn[pos-2].h,blocks[j].w,10,1,1,1);
-				}
-			}
-		}
-	}
-  for (unsigned int i=0; i<size(); i++) {
-		if(inHand&&held.bGrabbed){
-      drawIndicators(held,blocks[i]);
-		}
-	}
+  
+  if(held.bGrabbed){
+    held.drawShadow();
+    held.draw();
+  }
+  
   if(inHand&&held.bGrabbed){
     drawIndicators(held, base);
+    for (unsigned int i=0; i<size(); i++) {
+      drawIndicators(held,blocks[i]);
+    }
   }
+  
+  
 }

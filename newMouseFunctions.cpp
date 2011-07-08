@@ -10,89 +10,6 @@
 
 #include "blocks.h"
 
-int block::newHeightOn()
-{
-  int ret=0;
-  for (unsigned int i=0; i<blocksOn.size(); i++) {
-    blocksOn[i].newUpdateHeight();
-    ret+=blocksOn[i].h;
-  }
-  return ret;
-}
-
-int block::newHeightIn()
-{
-  int ret=0;
-  for (unsigned int i=0; i<blocksIn.size(); i++) {
-    blocksIn[i].newUpdateHeight();
-  }
-  
-}
-
-void block::newUpdateHeight(block * held)
-{
-  
-}
-
-void block::newUpdatePositions(block * held)
-{
-  
-}
-
-int block::newBelow(block & t)
-{
-  int ret=0;
-  int midLine=y;
-  int cH=h+y+newHeightOn();
-  if(bConditional){
-    int bottomSpace=h0-(yIn0+hIn0);
-    midLine=y+h-bottomSpace;
-    cH+=yIn0/2-midLine;
-  }
-  else {
-    midLine=y+h/2;
-    cH+=h/2-midLine;
-  }
-  if(t.inBounds(x, midLine, w, cH))
-    ret=true;
-  return ret;
-}
-
-int block::newInside(block & drop)
-{
-  int ret=0;
-  if(bConditional){
-    int inLine=y+yIn0/2;
-    int bottomSpace=h0-(yIn0+hIn0);
-    int inH=yIn0/2+h-(yIn0+bottomSpace);
-    if(drop.inBounds(x+xIn0, inLine, w-xIn0, inH))
-      ret=true;
-  }
-  return ret;
-}
-
-bool block::beneath(block & chk, int blw)
-{
-  bool ret=0;
-  int bottomSpace=h0-(yIn0+hIn0);
-  int midLine=y+h/2;
-  
-  if(bConditional) midLine=y+h-bottomSpace;
-  int cH=h+y-midLine+blw;
-  
-  if(chk.inBounds(x, midLine, w, cH)) ret=true;  
-  return ret;
-}
-       
-bool block::inBounds(int xX, int yX, int wX, int hX)
-{
-  bool ret=0;
-  int pH=h;
-  if(bConditional) pH=yIn0;
-  if(((x>xX && x<xX+wX)||(x+w>xX && x+w<xX+wX)||(x<=xX && x+w >= xX + wX))&&((y>yX && y<yX+hX)||(y+pH>yX && y+pH<yX+hX))) ret=true;
-  return ret;
-}
-
 bool block::newClickUp(int _x, int _y)
 {
   for (unsigned int j=0; j<ddGroup.size(); j++) {
@@ -172,17 +89,57 @@ dropBlock underWhich(block & strt, block & drpd)
   return ret;
 }
 
+void resetInsertSpace(block & t){
+  t.insertSpace=0;
+  for (unsigned int i=0; i<t.blocksIn.size(); i++) {
+    resetInsertSpace(t.blocksIn[i]);
+  }
+  for (unsigned int i=0; i<t.blocksOn.size(); i++) {
+    resetInsertSpace(t.blocksOn[i]);
+  }
+}
+
 //******************************** bGroup ************************************
+
+void bGroup::drag(double _x, double _y){
+	//-------- if we're holding a block, update the position
+	if(inHand){
+    if(held.bGrabbed){
+      held.move(_x+dispx, _y+dispy);
+      held.newUpdatePositions();
+      /*for (unsigned int i=0; i<blocks.size(); i++) {
+        dropBlock db=underWhich(blocks[i], held);
+        if(db.found()){
+          if((db.index)&&(db.index-1)<db.inThis->size()){
+            db.inThis->at(db.index-1).insertSpace=held.newHeightOn()+held.h;
+            //cout << db.inThis->at(db.index-1).insertSpace << endl;
+            for (unsigned int i=0; i<db.inThis->size(); i++) {
+              if(i!=db.index-1) resetInsertSpace(db.inThis->at(i));
+            }
+          }
+          else if((db.index==0)){
+            db.belowThis->insertSpace=held.newHeightOn();
+            for (unsigned int i=0; i<db.inThis->size(); i++) {
+              resetInsertSpace(db.inThis->at(i));
+            }
+          }
+        }
+        else resetInsertSpace(blocks[i]);
+      }*/
+    }
+	}
+}
 
 bool bGroup::newClickUp(int _x, int _y)
 {
   for (unsigned int i=0; i<blocks.size(); i++) {
     blocks[i].newClickUp(x,y);
+    resetInsertSpace(blocks[i]);
   }
   base.newClickUp(x, y);
   bool ret=0;
   if(held.bGrabbed){
-    held.clickUp();
+    held.newClickUp(_x,_y);
     if(!(held.x<x||held.x>x+w||held.y<y||held.y>y+h)){
       if(processBlockDrop(held, base)) ret=true;
       for (unsigned int i=0; i<blocks.size()&&!ret; i++){
@@ -192,8 +149,9 @@ bool bGroup::newClickUp(int _x, int _y)
       }
       if(!ret) pushBlocks(held, blocks, blocks.size(),true);
     }
+    recordState();
   }
-  inHand=false;
+  bGrabbed=inHand=false;
   return ret;
 }
 

@@ -12,7 +12,7 @@
 bool block::newClickInside(int _x, int _y)
 {
   bool ret=false;
-  if(bConditional&&_x>x+xIn0&&_x<x+w-xIn0&&_y>y+yIn0&&_y<y+yIn0+h) ret=true;
+  if(bConditional&&_x>x+xIn0&&_x<x+fullWidth()-xIn0&&_y>y+yIn0&&_y<y+yIn0+h) ret=true;
   return ret;
 }
 

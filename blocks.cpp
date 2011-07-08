@@ -53,7 +53,7 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
 	
 	arialHeader.loadFont(defaultFont);
 	arialHeader.setSize(14);
-	
+	insertSpace=0;
 	//-------- color initialization
 	if(cur.getAttribute("color").length())
 		color=ofColor(strtol(cur.getAttribute("color").c_str(),NULL,0));
@@ -338,6 +338,7 @@ void block::operator=(const block &t) {
 	color=t.color;
 	bBase=t.bBase;
 	bSeq=t.bSeq;
+  insertSpace=t.insertSpace;
 }
 
 /*****************************************************************
@@ -400,132 +401,6 @@ block & block::operator[](int i){
 	return blocksOn[i];
 }
 
-//-------------------------- Updating Functions --------------------------------------------------------
-
-/*****************************************************************
- * updatePositions() :: function of block
- *
- *  Description::
- *
- *
- *  Input_________
- *
- *    NONE :
- *
- *  Output________
- *
- *    NONE :
- *
- */
-
-void block::updatePositions(){
-	if(blocksIn.size()) blocksIn[0].move(x+20,y+40),blocksIn[0].updatePositions();
-	for (unsigned int i=1; i<blocksIn.size()&&blocksIn.size()>1; i++) {
-		blocksIn[i].move(blocksIn[i-1].x,blocksIn[i-1].y+blocksIn[i-1].h-5);
-		blocksIn[i].updatePositions();
-	}
-	if(blocksOn.size()) blocksOn[0].move(x,y+h-5),blocksOn[0].updatePositions();
-	for (unsigned int i=1; i<blocksOn.size()&&blocksOn.size()>1; i++) {
-		blocksOn[i].move(blocksOn[i-1].x,blocksOn[i-1].y+blocksOn[i-1].h-5);
-		blocksOn[i].updatePositions();
-	}
-	for (unsigned int i=0; i<numBlocks.size(); i++) {
-			numBlocks[i].move(x+numBlocks[i].xo+1,y+(40-numBlocks[i].h)/2);
-	}
-}
-
-/*****************************************************************
- * updatePositions(block & t) :: function of block
- *
- *  Description::
- *
- *
- *  Input_________
- *
- *    block & t :
- *
- *  Output________
- *
- *    NONE :
- *
- */
-
-void block::updatePositions(block & t){
-	
-	if(blocksIn.size()&&!bSeq&&blockIsInside(t)==1&&!blocksIn[0].onInside(t.x, t.y)) blocksIn[0].move(x+xIn0,y+yIn0-5+t.h+t.heightOnlyOn()),blocksIn[0].updatePositions(t);
-	else if(blocksIn.size()) blocksIn[0].move(x+xIn0,y+yIn0),blocksIn[0].updatePositions(t);
-	for (unsigned int i=1; i<blocksIn.size()&&blocksIn.size()>1; i++) {
-		if(blockIsInside(t)-1==i&&!bSeq&&!blocksIn[i-1].onInside(t.x, t.y)&&!blocksIn[i].bConditional) 
-			blocksIn[i].move(blocksIn[i-1].x,blocksIn[i-1].y+blocksIn[i-1].h+t.h+t.heightOnlyOn()-10);
-		else blocksIn[i].move(blocksIn[i-1].x,blocksIn[i-1].y+blocksIn[i-1].h-5);
-		blocksIn[i].updatePositions(t);
-	}
-	if(blocksOn.size()&&!bSeq&&blockIsBelow(t)==1) blocksOn[0].move(x,y+h-5),blocksOn[0].updatePositions(t);
-	else if(blocksOn.size()) blocksOn[0].move(x,y+h-5),blocksOn[0].updatePositions(t);
-	for (unsigned int i=1; i<blocksOn.size()&&blocksOn.size()>1; i++) {
-		if(blocksOn[i-1].blockIsBelow(t)==1&&!bSeq&&!blocksOn[i-1].onInside(t.x, t.y)&&!blocksOn[i].bConditional) {
-			blocksOn[i].move(blocksOn[i-1].x,blocksOn[i-1].y+blocksOn[i-1].h+t.h+t.heightOnlyOn()-5);
-		}
-		else blocksOn[i].move(blocksOn[i-1].x,blocksOn[i-1].y+blocksOn[i-1].h-5);
-		blocksOn[i].updatePositions(t);
-	}
-	for (unsigned int i=0; i<numBlocks.size(); i++) {
-			numBlocks[i].move(x+numBlocks[i].xo+1,y+(40-numBlocks[i].h)/2);
-	}
-}
-
-/*****************************************************************
- * heightOnlyOn(bool moving) :: function of block
- *
- *  Description::
- *
- *
- *  Input_________
- *
- *    bool moving :
- *
- *  Output________
- *
- *    int :
- *
- */
-
-int block::heightOnlyOn(bool moving){
-	int ret=0;
-	for (unsigned int i=0; i<blocksOn.size(); i++) {
-		if(blocksOn[i].bConditional&&!moving) blocksOn[i].updateSize();
-		ret+=blocksOn[i].h-5;
-	}
-	return ret;
-}
-
-/*****************************************************************
- * heightInside() :: function of block
- *
- *  Description::
- *
- *
- *  Input_________
- *
- *    NONE :
- *
- *  Output________
- *
- *    int :
- *
- */
-
-int block::heightInside(){
-	int ret=0;
-	if(blocksIn.size()&&bConditional)
-		for (unsigned int i=0; i<blocksIn.size(); i++) {
-			ret+=blocksIn[i].h-5;
-		}
-	else if (bConditional&&blocksIn.size()==0) {
-		ret=oH-65;
-	}
-	return ret;
-}
 
 /*****************************************************************
  * fullWidth() :: function of block
@@ -558,148 +433,7 @@ double block::fullWidth()
   return ret;
 }
 
-/*****************************************************************
- * updateSize(int k) :: function of block
- *
- *  Description::
- *
- *
- *  Input_________
- *
- *    int k :
- *
- *  Output________
- *
- *    bool :
- *
- */
 
-bool block::updateSize(int k)
-{
-	bool ret=false;
-	for (unsigned int i=0; i<blocksIn.size(); i++) {
-		blocksIn[i].updateSize();
-	}
-	for (unsigned int i=0; i<blocksOn.size(); i++) {
-		blocksOn[i].updateSize();
-	}
-	if(bConditional&&heightInside()+65!=h) h=heightInside()+65,ret=true;
-	return ret;
-}
-
-
-//---------------------------------- Block Connect Functions ----------------------
-
-vector<block> block::passBlocks(ofBlockType d,int start)
-{
-	vector<block> ret;
-	if(d==OF_BLOCK_ON){
-		ret.assign(blocksOn.begin()+start,blocksOn.end());
-		blocksOn.erase(blocksOn.begin()+start,blocksOn.end());
-	}
-	else if(d==OF_BLOCK_IN){
-		ret.assign(blocksIn.begin()+start,blocksIn.end());
-		blocksIn.erase(blocksIn.begin()+start,blocksIn.end());
-	}
-	return ret;
-}
-
-void block::addOn(block t,int pos=0){
-	vector<block> k=t.passBlocks(OF_BLOCK_ON, 0);
-	blocksOn.insert(blocksOn.begin()+pos,block(t));
-	blocksOn.insert(blocksOn.begin()+pos+1,k.begin(),k.end());
-	blocksOn[pos].bGrabbed=false;
-}
-
-bool block::below(int _x,int _y,int dispx, int dispy){
-	return ((_x+dispx>x&&_x+dispx<x+w)||\
-			(_x+dispx+75>x&&_x+dispx+75<x+w))&& \
-	(_y+dispy)>y+h-10&&(_y+dispy)<y+h+30;
-}
-
-int block::blockIsBelow(block t)
-{
-	int ret=0;
-	if(below(t.x,t.y+5)) ret=1;
-	for (int i=0; i<blocksOn.size(); i++) {
-		if(blocksOn[i].below(t.x,t.y+5)) ret=i+2;
-	}
-	return ret;
-}
-
-bool block::onInside(int _x,int _y,int dispx, int dispy){
-	return bConditional&&((_x>x&&_x<x+w)||((_x+75)>x&&(_x+75)<x+w))&&(_y>y+20&&_y<y+h-10);
-}
-
-bool block::clickInside(int _x,int _y){
-	return bConditional&&((_x>x+20&&_x<x+w))&&(_y>y+40&&_y<y+h-20);
-}
-
-int block::blockIsInside(block t)
-{
-	int ret=0;
-	if(!blocksIn.size()) 
-		if(onInside(t.x,t.y+5)) ret=1;
-	for (int i=0; i<blocksIn.size(); i++) {
-		if(onInside(t.x,t.y+5)&&t.y+5<blocksIn[i].y+blocksIn[i].h){
-			ret=i+1;
-			break;
-		}
-		if(onInside(t.x,t.y+5)&&blocksIn[i].below(t.x,t.y+5)){
-			ret=i+2;
-			break;
-		}
-	}
-	return ret;
-}
-
-bool block::overNum(block & t)
-{
-	return (placeHolder&&((t.x>x&&t.x<x+w)||((t.x+t.w/2)>x&&(t.x+t.w/2)<x+w))&&((t.y>y&&t.y<y+h)||(t.y+t.h/2>y&&t.y+t.h/2<y+h)));
-}
-
-int block::blockIsOverNum(block & t){
-	int ret=0;
-	for (unsigned int i=0; i<numBlocks.size(); i++) {
-		if (numBlocks[i].overNum(t)) {
-			ret=i+1;
-		}
-	}
-	return ret;
-}
-
-void block::addInside(int i, block t)
-{
-	if(i<blocksIn.size()){
-		int pos=0;
-		if(blocksIn[i].bConditional&&(pos=blocksIn[i].blockIsInside(t))){
-			blocksIn[i].addInside(pos-1,t);
-		}
-		else {
-			addIn(t, i);
-		}
-	}
-	else addIn(t, i);
-}
-
-void block::addInside(block & check, block grab, int i)
-{
-	int pos=0;
-	if(check.bConditional&&(pos=check.blockIsInside(grab))){
-		check.addInside(check.blocksIn[pos-1],grab,pos-1);
-	}
-	else {
-		addIn(grab, i);
-	}
-}
-
-
-void block::addIn(block t,int pos){
-	vector<block> k=t.passBlocks(OF_BLOCK_ON, 0);
-	blocksIn.insert(blocksIn.begin()+pos,block(t));
-	blocksIn.insert(blocksIn.begin()+pos+1,k.begin(),k.end());
-	blocksIn[pos].bGrabbed=false;
-}
 
 
 
@@ -802,14 +536,6 @@ bool bGroup::redoAvailable()
 
 //----------------------- Add block Functions -------------------
 
-int bGroup::add(vector<block> t, int j){
-	int cur=blocks.size();
-	blocks.push_back(t[j]);
-	if(t.size()>j+1) blocks[cur].blocksOn.assign(t.begin()+(j+1),t.end());
-	t.erase(t.begin()+j,t.end());
-	return cur;
-}
-
 void bGroup::addFromSB(block t,int _x,int _y){
 	if(t.over(_x,_y)||t.onBlockOn(_x, _y)&&!inHand){
 		int numBlocks=size();
@@ -826,61 +552,16 @@ void bGroup::addFromSB(block t,int _x,int _y){
 	}
 }
 
-void bGroup::addFromClick(block & t, int _x, int _y)
-{
-	for (unsigned int j=0; j<t.blocksIn.size(); j++) {
-		if (!inHand&&!ddopen&&!t.ddSelected){
-			int blk=0;
-			if(blk=t.blocksIn[j].onBlockIn(_x, _y)){
-				addFromClick(t.blocksIn[j].blocksIn[blk-1], _x, _y);
-			}
-			else if(t.blocksIn[j].clickDown(_x,_y)) {
-				int cur=add(t.passBlocks(OF_BLOCK_IN,j));
-				inHand=true;
-				dispx = blocks[cur].x-_x;
-				dispy = blocks[cur].y-_y;
-			}
-		}
-	}
-	for (unsigned int j=0; j<t.blocksOn.size(); j++) {
-		if (!inHand&&!ddopen&&!t.ddSelected){
-			int blk=0;
-			if(blk=t.blocksOn[j].onBlockIn(_x, _y)){
-				addFromClick(t.blocksOn[j].blocksIn[blk-1], _x, _y);
-			}
-		}
-	}
-}
-
-
-
-int bGroup::heightUpdate(block & grab, block & comp)
-{
-	int ret=0;
-	for (unsigned int i=0; i<comp.numInside(); i++) {
-		heightUpdate(grab, comp.blocksIn[i]);
-	}
-	for (unsigned int i=0; i<comp.size(); i++) {
-		heightUpdate(grab, comp.blocksOn[i]);
-	}
-	if(comp.blockIsInside(grab)&&!comp.bSeq&&!grab.numBlock){
-		if(!comp.inBlockIn(grab.x,grab.y)) comp.h=grab.heightOnlyOn(true)+comp.heightInside()+grab.h+65-((!comp.numInside())?comp.yIn0:0)-5;
-		else comp.h=comp.heightInside()+65-((!comp.numInside())?comp.yIn0:0)-5;
-		comp.updatePositions(grab);
-	}
-	return ret;
-}
-
 void bGroup::update()
 {
 	for (unsigned int i=0; i<blocks.size(); i++) {
-		blocks[i].updateSize();
-		blocks[i].updatePositions();
+		blocks[i].newUpdateHeight();
+		blocks[i].newUpdatePositions();
 	}
-	base.updateSize();
-	base.updatePositions();
+	base.newUpdateHeight();
+	base.newUpdatePositions();
 	
-	for (unsigned int i=0; i<blocks.size(); i++) {
+	/*for (unsigned int i=0; i<blocks.size(); i++) {
 		if(inHand&&blocks[i].bGrabbed){
 			for (unsigned int j=0; j<blocks.size(); j++) {
 				if(i!=j) heightUpdate(blocks[i], blocks[j]);
@@ -891,7 +572,7 @@ void bGroup::update()
 			}
 			heightUpdate(blocks[i], base);
 		}
-	}
+	}*/
 }
 
 
