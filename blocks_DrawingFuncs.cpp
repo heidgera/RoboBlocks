@@ -17,7 +17,7 @@ void block::drawShadow(){
 	
 	ofSetColor(0, 0, 0,75);
 	if (bConditional) {
-		drawBigBlockShadow(x+5,y+5,w,h,oH);
+		drawBigBlockShadow(x+5,y+5,w,h,h0);
 	}
 	//-------- if a block is a conditional statement block, draw the rounded block shadow
 	else if(numBlock) {
@@ -42,7 +42,7 @@ void block::drawSelected(){
 	
 	ofSetColor(0xF4ED47);
 	if (bConditional) {
-		drawBigBlockShadow(x-5,y-5,w+10,h+10,oH+10);
+		drawBigBlockShadow(x-5,y-5,w+10,h+10,h0+10);
 	}
 	//-------- if a block is a conditional statement block, draw the rounded block shadow
 	else if(numBlock) {
@@ -78,7 +78,7 @@ void block::drawDD(double vert){
 		if(!ddGroup[i].open){
 			ddGroup[i].move(x+ddGroup[i].xdis,y+10*vert);
 			ddGroup[i].changeSize(ddGroup[i].w, (ddGroup[i].arial.stringHeight("1")+4)*vert);
-			if(h>=oH*.90) ddGroup[i].draw();
+			if(h>=h0*.90) ddGroup[i].draw();
 			else if(vert>.01) ddGroup[i].drawShape();
 		}
 	}
@@ -97,7 +97,7 @@ void block::drawOpenDD(){
 	for (unsigned int i=0; i<ddGroup.size(); i++) {
 		if(ddGroup[i].open){
 			ddGroup[i].move(x+ddGroup[i].xdis,y+10);
-			if(h>=oH*.90) ddGroup[i].draw();
+			if(h>=h0*.90) ddGroup[i].draw();
 		}
 	}
 }
@@ -112,13 +112,13 @@ void block::draw(int _x, int _y)
 void block::draw(bool fade){
 	//******** TODO: this really should be updated to matrix transformations of the shapes
 	//-------- as it stands we divide the height by the original height, to get a scaling factor
-	double vert=(h/oH>0.1) ? h/oH : 0;
+	double vert=(h/h0>0.1) ? h/h0 : 0;
 	if(vert>1)vert=1;
-	//-------- if h/oH>.01 then
+	//-------- if h/h0>.01 then
 	if(vert){
 		//-------- we set the color of the block and draw the shape depending on type
 		ofSetColor(color);
-		if (bConditional) drawBigBlock(x,y,w,h,oH);
+		if (bConditional) drawBigBlock(x,y,w,h,h0,w0);
 		else if(numBlock) ofRoundBox(x,y,w,h,h/4*vert);
 		else if(bBase) drawBaseBlock(x, y, w, h);
 		else drawBlock(x,y,w,h);
@@ -164,7 +164,7 @@ void block::draw(bool fade){
 	if(fade){
 		ofSetColor(255, 255, 255,75);
 		if (bConditional) {
-			drawBigBlockShadow(x,y,w,h,oH);
+			drawBigBlockShadow(x,y,w,h,h0);
 		}
 		//-------- if a block is a conditional statement block, draw the rounded block shadow
 		else if(numBlock) {

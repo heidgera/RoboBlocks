@@ -29,6 +29,6 @@ void drawCircleSeg(double x, double y, double ir, double oR,int beg,int end, dou
 
 void drawBigBlockShadow(double x, double y, double w, double h,double oH);
 
-void drawBigBlock(double x, double y, double w, double h, double oh);
+void drawBigBlock(double x, double y, double w, double h, double oh, double ow);
 
 #endif

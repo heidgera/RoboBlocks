@@ -69,7 +69,7 @@ void block::newUpdatePositions()
   }
   alignBlocks(blocksIn);
   if(blocksOn.size()){
-    blocksOn[0].move(x+xIn0,y+h+insertSpace-5);
+    blocksOn[0].move(x,y+h+insertSpace-5);
     blocksOn[0].newUpdatePositions();
   }
   alignBlocks(blocksOn);

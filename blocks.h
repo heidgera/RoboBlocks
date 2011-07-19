@@ -24,9 +24,28 @@
 #include <algorithm>
 #include <deque>
 
+
+
 //************ type for different kinds of blocks *********
 enum ofBlockType {
 	OF_BLOCK_NULL,OF_BLOCK_ON,OF_BLOCK_IN,OF_BLOCK_NUM
+};
+
+enum ofBlockActions {
+  OF_BLOCK_NULL_ACT,OF_BLOCK_MOVE, OF_BLOCK_TURN, OF_BLOCK_WHILE, OF_BLOCK_IF,OF_BLOCK_REPEAT
+};
+
+struct blockAction {
+  ofBlockActions act;
+  double data[2];
+  string dataStr;
+  blockAction(){
+    act=OF_BLOCK_NULL_ACT;
+    data[0]=data[1]=0;
+  }
+  blockAction(ofBlockActions a, double d1, double d2=0){
+    act=a,data[0]=d1,data[1]=d2;
+  }
 };
 
 /*****************************************************************
@@ -67,9 +86,9 @@ enum ofBlockType {
 class block: public ofInterObj {
 public:
 	ofColor color;
-	bool grabbed,grabbedOn,placeHolder;
+	bool placeHolder;
 	int ddOpen;
-	bool cond,numBlock, numHolder,ddSelected,deleteMe, bBase,bSeq;
+	bool cond,numBlock, numHolder,ddSelected, bBase,bSeq;
 	vector<block> numBlocks;
 	vector<block> blocksIn;
 	vector<block> blocksOn;
@@ -77,7 +96,9 @@ public:
 	vector<string> part;
 	unsigned char typ;
 	vector<ofDropDown> ddGroup;
-	int oH,titleDisp,xo;
+	int titleDisp,xo;
+  
+  blockAction action;
   
   int h0,w0,xIn0,yIn0,hIn0;
   
@@ -97,6 +118,18 @@ public:
 	void setup(double _w, double _h);
 	
 	void operator=(const block &t);
+  
+  //*********** action functions
+  
+  void registerAction(string str);
+  
+  double evalVar(string str);
+  
+  void parseAction();
+  
+  double parseNumber(string str);
+  
+  //*********** draw functions
 	
 	void drawShadow();
 	
@@ -133,14 +166,6 @@ public:
 	void printOut(ofstream* k,ifstream * f,int t=0, map<string,bool> * printed=0);
 	
 	void printData(string part,ofstream* k,int t=0,map<string,bool> * printed=0, bool printIn=true);
-	
-	//bool clickDown(int _x, int _y);
-	
-	//bool clickUp();
-	
-	bool ddClickDown(int _x, int _y, bool & ddopen, bool inHand);
-	
-	vector<block> passBlocks(ofBlockType d,int start);
 	
 	int blockIsBelow(block t);
   

@@ -312,14 +312,14 @@ void drawBigBlockShadow(double x, double y, double w, double h,double oH){
 	glEnd();
 }
 
-void drawBigBlock(double x, double y, double w, double h, double oh){
+void drawBigBlock(double x, double y, double w, double h, double oh,double ow){
 	float r=ofGetStyle().color.r/255.;
 	float g=ofGetStyle().color.g/255.;
 	float b=ofGetStyle().color.b/255.;
 	if(h>5) h-=5;
 	double v=(h>5) ? 2*h/21 : 0;
 	if(v) v=(h<oh) ? 2*h/21 : 2*oh/21;
-	double s=w/20;
+	double s=ow/20;
 	double shBot=-.5;
 	double shTop=.6;
 	double botDis=v;

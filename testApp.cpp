@@ -55,6 +55,19 @@ void testApp::setup(){
   
 	ofHideCursor();
 	pointer.loadImage("images/pointer.png");
+  
+  if (sets.size()==1) {
+    loadBlocks(sets[0]);
+  }
+  
+  devExists=false;
+  justChecked=false;
+  int numPorts = dev.listDir("/dev/");
+  for (int i=0; i<numPorts; i++) {
+    string split(dev.getPath(i),0,12);
+    if(split=="/dev/tty.usb")
+      devExists=true;
+  }
 }
 
 //--------------------------------------------------------------
@@ -96,6 +109,17 @@ void testApp::update(){
 	
   if(anim.isPlaying())
     anim.updateNextEvent();
+  
+  if((ofGetElapsedTimeMillis()/1000)%2&&!(justChecked)&&(justChecked=true)){
+    devExists=false;
+    int numPorts = dev.listDir("/dev/");
+    for (int i=0; i<numPorts; i++) {
+      string split(dev.getPath(i),0,12);
+      if(split=="/dev/tty.usb")
+        devExists=true;
+    }
+  }
+  else if((ofGetElapsedTimeMillis()/1000)%2==0) justChecked=false;
 }
 
 
@@ -227,6 +251,16 @@ void testApp::draw(){
 	else {
     ofSetColor(255, 255, 255);
     pointer.draw(mouseX-10, mouseY, pointer.width*2,pointer.height*2);
+  }
+  
+  if(0&&!devExists){
+    ofSetColor(0, 0, 0,196);
+    ofRect(0, 0, ofGetWidth(), ofGetHeight());
+		titleFont.setSize(70);
+		string printOut="Connect the robot to begin";
+		ofSetColor(255, 255, 255);
+		titleFont.drawString(printOut, ofGetWidth()/2, ofGetHeight()/2);
+		titleFont.setSize(30);
   }
 }
 

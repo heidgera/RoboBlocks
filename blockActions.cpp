@@ -1,0 +1,193 @@
+/*
+ *  blockActions.cpp
+ *  robotBlocks
+ *
+ *  Created by Exhibits on 7/13/11.
+ *  Copyright 2011 Science Museum of Minnesota. All rights reserved.
+ *
+ */
+
+extern int pixPerInch;
+
+#include "blocks.h"
+
+struct evalData {
+  bool isNumber;
+  double number;
+  string varName;
+  int usrData;
+  char nextOperator;
+  evalData(double num){
+    number=num;
+    isNumber=true;
+    usrData=nextOperator=0;
+  }
+  evalData(){
+    isNumber=false;
+    usrData=nextOperator=0;
+  }
+  evalData(string var){
+    isNumber=false;
+    varName=var;
+    usrData=nextOperator=0;
+  }
+};
+
+evalData operate(evalData & first, evalData & second)
+{
+  evalData ret;
+  switch (first.nextOperator) {
+    case '-':
+      ret.number=first.number-second.number;
+      break;
+    case '+':
+      ret.number=first.number+second.number;
+      break;
+    case '/':
+      ret.number=first.number/second.number;
+      break;
+    case '*':
+      ret.number=first.number*second.number;
+      break;
+    default:
+      break;
+  }
+  ret.isNumber=true;
+  ret.nextOperator=second.nextOperator;
+  
+  ret.varName=ofToString(ret.number,0);
+
+  return ret;
+}
+
+int getNumDelimited(string exp, string delims)
+{
+  int ret=0;
+  for (unsigned int i=0; i<exp.length(); i++) {
+    if (isDelim(exp[i],delims)) {
+      ret++;
+    }
+  }
+  return ret+1;
+}
+
+evalData getSubExpression(string exp, int j)
+{
+  evalData ret;
+  string delims="+-/*";
+  string expr;
+  int strt=0, end=0;
+  int expNum=0;
+  int numDeltd=getNumDelimited(exp, delims);
+  if(j>numDeltd) j=numDeltd;
+  for (unsigned int i=0; i<exp.length(); i++) {
+    if (isDelim(exp[i],delims)) {
+      strt=((expNum==0)?end:end+1);
+      end=i;
+      if(expNum==j){
+        expr=string(exp,strt,end-strt);
+        if(i<exp.length()-1&&i) ret.nextOperator=exp[i];
+        else if(i==0) ret.nextOperator=exp[i];
+      }
+      expNum++;
+    }
+  }
+  if(j==expNum){
+    strt=((j>0)?end+1:end);
+    end=exp.length();
+    expr=string(exp,strt,end-strt);
+  }
+  ret.varName=expr;
+  if(expr.length()&&expr[0]!='$') ret.number=ofToInt(ret.varName), ret.isNumber=true;
+  if(!expr.length()&&ret.nextOperator=='-'){
+    ret.number=-1;
+    ret.isNumber=true;
+    ret.nextOperator='*';
+    ret.varName="-1";
+  }
+
+  return ret;
+}
+
+vector<evalData> breakIntoEvaluable(string exp)
+{
+  vector<evalData> ret;
+  for (int i=0; i<getNumDelimited(exp, "+-/*"); i++) {
+    ret.push_back(getSubExpression(exp, i));
+  }
+  return ret;
+}
+
+vector<evalData> evaluateNumbers(string exp)
+{
+  vector<evalData> ret;
+  vector<evalData> eval=breakIntoEvaluable(exp);
+  for (unsigned int i=0; i<eval.size(); i++) {
+    if(i<eval.size()-1&&eval[i].isNumber&&eval[i+1].isNumber){
+      if((eval[i+1].nextOperator!='*'&&eval[i+1].nextOperator!='/')||(eval[i].nextOperator=='*'||eval[i].nextOperator=='/')){
+        evalData newData=operate(eval[i], eval[i+1]);
+        eval[i]=newData;
+        eval.erase(eval.begin()+i+1);
+      }
+    }
+  }
+  for (unsigned int i=0; i<eval.size(); i++) {
+    if(i<eval.size()-1&&eval[i].isNumber&&eval[i+1].isNumber){
+      evalData newData=operate(eval[i], eval[i+1]);
+      eval[i]=newData;
+      eval.erase(eval.begin()+i+1);
+    }
+  }
+  ret=eval;
+  return ret;
+}
+
+void block::registerAction(string str)
+{
+  vector<string> splt=ofSplitString(str, ":");
+  if(splt.size()>1){
+    if(splt[0]=="move") action.act=OF_BLOCK_MOVE;
+    else if(splt[0]=="turn") action.act=OF_BLOCK_TURN;
+    else if(splt[0]=="while") action.act=OF_BLOCK_WHILE;
+    else if(splt[0]=="if") action.act=OF_BLOCK_IF;
+    else if(splt[0]=="repeat") action.act=OF_BLOCK_REPEAT;
+    action.dataStr=splt[1];
+  }
+  vector<evalData> eval=evaluateNumbers(action.dataStr);
+  string t;
+  for (unsigned int i=0; i<eval.size(); i++) {
+    if(!eval[i].isNumber) eval[i].number=evalVar(eval[i].varName),eval[i].varName=ofToString(eval[i].number,0), eval[i].isNumber=true;
+    t+=eval[i].varName+eval[i].nextOperator;
+  }
+  eval=evaluateNumbers(t);
+  
+  for (unsigned int i=0; i<eval.size(); i++) {
+    cout << eval[i].number << " is the number\n";
+  }
+  //evaluateNumbers("-24+6/2-34*$jklol");
+}
+
+double block::evalVar(string str)
+{
+  double ret=0;
+  vector<string> spl=ofSplitString(str, "$[]()");
+  for (unsigned int i=0; i<spl.size(); i++) {
+    if(spl[i]=="dd") ret=ddGroup[ofToInt(spl[i+1])].getValue();
+    else if(spl[i]=="ppi") ret=pixPerInch;
+    else if(spl[i]=="forever") ret=1e10;
+    else if(spl[i]=="front") ret=1;
+    else if(spl[i]=="!front") ret=0;
+  }
+  return ret;
+}
+
+void block::parseAction()
+{
+  switch (action.act) {
+    case OF_BLOCK_MOVE:
+      action.data[0]=parseNumber(action.dataStr);
+      break;
+    default:
+      break;
+  }
+}

@@ -105,6 +105,10 @@ class testApp : public ofBaseApp{
   ofButton  demo;
   
   rootGroup sets;
+  
+  ofxDirList dev;
+  bool justChecked;
+  bool devExists;
 };
 
 #endif

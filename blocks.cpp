@@ -25,6 +25,8 @@
 #include <vector>
 #include <algorithm>
 
+int pixPerInch=100;
+
 string defaultFont="ArialNarrow.ttf";
 
 /*****************************************************************
@@ -65,7 +67,7 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
 	
 	//-------- init some variables, to prevent garbage from happening
 	bConditional=0;
-	numBlock=ddOpen=deleteMe=false;
+	numBlock=ddOpen=false;
 	titleDisp=10;
 	y=_y;
 	numHolder=false;
@@ -79,7 +81,7 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
 	list["cond"]=1;
 	list["wid"]=2;
 	list["hgt"]=3;
-	list["ifblock"]=4;
+	list["action"]=4;
 	list["file"]=5;
 	list["part"]=6;
 	list["num"]=7;
@@ -107,10 +109,8 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
         case 3: // hgt, deprecated, same as above
           h=atoi(node[1].c_str());
           break;
-        case 4: //ifblock
-          //-- sets the flag for being a numHolder
-          //-- deprecated, i think, by %n in the title
-          numHolder=true;
+        case 4: //actions
+          registerAction(node[1]);
           break;
         case 5: // file
           //-- definitely not deprecated, used to store value of which file to write from
@@ -181,7 +181,7 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
 		if(!titleSplit[i].compare("%d")){
 			if(ddNum<ddGroup.size()){
 				//-------- augment the orginal positon with the current total width
-				ddGroup[ddNum].xdis+=totalwidth+spSize;
+				ddGroup[ddNum].xdis+=totalwidth+spSize*1.5;
 				//-------- update total width
 				totalwidth+=ddGroup[ddNum].w+spSize*2;
 				//-------- if you have two dropdowns in a row, make sure they don't overlap
@@ -237,8 +237,8 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
 			}
 		}
 	}
-	double newWid=totalwidth+10;
-	if(!numBlock) w=max(w,newWid);
+	double newWid=totalwidth+titleDisp;
+	if(!numBlock) w=max(newWid,w);
 	else {
 		w=newWid-10;
 	}
@@ -246,7 +246,7 @@ block::block(ofTag & cur,ofColor col, int _y):ofInterObj(-200,-200,150,45) {
 	for(int i=0; i<ddGroup.size(); i++)
 		ddGroup[i].changeSize(ddGroup[i].w, (ddGroup[i].arial.stringHeight("1")+4));
 
-	oH=h;
+	h0=h;
 }
 
 /*****************************************************************
@@ -319,9 +319,7 @@ void block::operator=(const block &t) {
   xIn0=t.xIn0;
   hIn0=t.hIn0;
 	arialHeader=t.arialHeader;
-	oH=t.oH;
 	numBlock=t.numBlock;
-	typ=t.typ;
 	bConditional=t.bConditional;
 	bGrabbed=t.bGrabbed;
 	title =t.title;
@@ -332,7 +330,6 @@ void block::operator=(const block &t) {
 	blocksOn=t.blocksOn;
 	blocksIn=t.blocksIn;
 	ddOpen=t.ddOpen;
-	deleteMe=t.deleteMe;
 	numHolder=t.numHolder;
 	placeHolder=t.placeHolder;
 	color=t.color;
@@ -360,7 +357,7 @@ void block::operator=(const block &t) {
 
 void block::setup(double _w, double _h)
 {
-	w=_w, h=oH=_h;
+	w=_w, h=_h;
   w0=w;
   h0=h;
   hIn0=0;
@@ -373,7 +370,7 @@ void block::setup(double _w, double _h)
   title="";
 	bConditional=0;
 	w=max(w,double(arialHeader.stringWidth(title)+20));
-	numBlock=ddOpen=deleteMe=false;
+	numBlock=ddOpen=false;
 	titleDisp=10;
 	numHolder=false;
 	color.set(0xdbb700);

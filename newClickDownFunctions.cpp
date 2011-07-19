@@ -61,12 +61,10 @@ bool bGroup::newHandleClick(vector<block> & chk, int i, int _x, int _y, bool top
 {
   bool ret=false;
   if(!chk[i].ddPassingClick(_x,_y)){
-    cout << "the dropdown took the click" << endl;
     if(chk[i].newClickDD(_x,_y,ddopen))
       ret=true;
   }
   else if(!ret&&chk[i].newClickDown(_x,_y)&&!ddopen){
-    cout << "We got into the block clickdown check" << endl;
     inHand=ret=true;
     dispx = chk[i].x-_x;
     dispy = chk[i].y-_y;

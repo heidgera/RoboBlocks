@@ -231,7 +231,7 @@ void sbGroup::updateBlocks(int i){
 		bars[i].blocks[j].x=(bars[i].w-30-w)/2;
 		bars[i].blocks[j].y=bars[i].y+5*bars[i].h/4+sideBarSpace*j*\
 		((bars[i+1].y-(bars[i].y+bars[i].h))/sideBarSpace)/divs;
-		bars[i].blocks[j].h=bars[i].blocks[j].oH*((bars[i+1].y-(bars[i].y+bars[i].h))/sideBarSpace);
+		bars[i].blocks[j].h=bars[i].blocks[j].h0*((bars[i+1].y-(bars[i].y+bars[i].h))/sideBarSpace);
 	}
 }
 
@@ -262,7 +262,6 @@ sbGroup::sbGroup(ofXML & xml,bGroup * destin):ofInterObj(){
 			string col=tag[i].getAttribute("color");
 			unsigned long colTrip=strtol(col.c_str(),NULL,0);
 			ofColor color(colTrip);
-			//cout << tag[i].getAttribute("name") + " " + tag[i].getLabel() <<endl;
 			unsigned int curBar=bars.size();
       int barHeight=40;
 			bars.push_back( sideBar(0,0,0,barHeight,tag[i].getAttribute("name"),color));
