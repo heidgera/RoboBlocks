@@ -4,6 +4,8 @@ string curDir="basic";
 string ROOT_NAME;
 string ROOT_DIR;
 
+extern int pixPerInch;
+
 //--------------------------------------------------------------
 void testApp::setup(){
 	ROOT_DIR=config("config.cfg");
@@ -68,6 +70,9 @@ void testApp::setup(){
     if(split=="/dev/tty.usb")
       devExists=true;
   }
+  
+  addWall(400, 300, 200, 20);
+  mapps.loadImage("maps/map_2.jpg");
 }
 
 //--------------------------------------------------------------
@@ -262,6 +267,47 @@ void testApp::draw(){
 		titleFont.drawString(printOut, ofGetWidth()/2, ofGetHeight()/2);
 		titleFont.setSize(30);
   }
+  
+  
+  if(blocks.isTesting()){
+
+    
+    ofSetColor(0x33, 0x33, 0x33);
+    ofRect(0, 0, ofGetWidth(), ofGetHeight());
+    
+		ofSetColor(0x444400);
+		for (int i=0; i*10<ofGetHeight(); i++) {
+			ofRect(0, i*10, ofGetWidth(), 1);
+		}
+		for (int i=0; i*10<ofGetWidth(); i++) {
+			ofRect(i*10, 0, 1, ofGetHeight());
+		}
+    
+    blocks.base.draw(ofGetHeight(), 75);
+    blocks.drawCurrentBlock();
+    
+    ofSetColor(0xCFCFCF);
+    ofShadeBox(0,0, ofGetWidth(), 75, OF_DOWN,(0xCF-0xA8)/255.);
+    ofShade(0, 75, 10, ofGetWidth(), OF_UP,.15);
+    ofShade(0, 75, 10, ofGetWidth(), OF_DOWN,.15);
+    
+    ofPushMatrix();
+    ofTranslate(100,100, 0);
+    ofScale(((double)ofGetHeight()-200.)/(double)blocks.mapp.width, (double(ofGetHeight())-200.)/double(blocks.mapp.width), 1);
+    ofSetColor(255, 255, 255);
+    blocks.mapp.draw(0, 0);
+    ofSetColor(0, 255, 0);
+    for (unsigned int i=0; i<walls().size(); i++) {
+      ofRect(walls()[i].pos.x,walls()[i].pos.y,walls()[i].w,walls()[i].h);
+    }
+    blocks.turtle.draw(0, 0);
+    
+    if(!blocks.turtle.frontIsClear(4*pixPerInch, blocks.mapp)) ofSetColor(255, 0, 0);
+    else ofSetColor(0, 255, 0);
+    ofPoint ps = blocks.turtle.pointAlongBearing(4*pixPerInch);
+    ofCircle(ps.x, ps.y, 5);
+    ofPopMatrix();
+  }
 }
 
 void testApp::upload()
@@ -300,6 +346,25 @@ void testApp::keyPressed(int key){
   if(key=='n'){
     animationStepRequested(animXML);
     animStep++;
+  }
+  if(key=='t'){
+    if (blocks.isTesting()) blocks.stopTesting();
+    else blocks.startTesting();
+  }
+  if(key==OF_KEY_UP){
+    blocks.turtle.move(6);
+  }
+  if(key==OF_KEY_RIGHT){
+    blocks.turtle.turn(6);
+  }
+  if(key==OF_KEY_LEFT){
+    blocks.turtle.turn(-6);
+  }
+  if(key==OF_KEY_DOWN){
+    blocks.turtle.move(-6);
+  }
+  if(key=='P'){
+    blocks.startSequence();
   }
 }
 

@@ -109,6 +109,8 @@ class testApp : public ofBaseApp{
   ofxDirList dev;
   bool justChecked;
   bool devExists;
+  
+  ofImage mapps;
 };
 
 #endif

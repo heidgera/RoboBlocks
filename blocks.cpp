@@ -25,7 +25,7 @@
 #include <vector>
 #include <algorithm>
 
-int pixPerInch=100;
+int pixPerInch=25;
 
 string defaultFont="ArialNarrow.ttf";
 
@@ -336,6 +336,7 @@ void block::operator=(const block &t) {
 	bBase=t.bBase;
 	bSeq=t.bSeq;
   insertSpace=t.insertSpace;
+  action=t.action;
 }
 
 /*****************************************************************
@@ -368,7 +369,7 @@ void block::setup(double _w, double _h)
 	//title="to program, connect blocks here";
 	//title="connect blocks here and press button";
   title="";
-	bConditional=0;
+	bGrabbed=bConditional=0;
 	w=max(w,double(arialHeader.stringWidth(title)+20));
 	numBlock=ddOpen=false;
 	titleDisp=10;
@@ -471,6 +472,7 @@ bGroup::~bGroup(){
 
 void bGroup::setup(double _x, double _y,double wid,double hgt){
 	//blocks.reserve(100);
+  bSequencePlay=bTesting=false;
 	bGrabbed=inHand=ddopen=false;
 	cSetup(_x,_y,wid,hgt);
 	used[""]=false;
@@ -478,6 +480,12 @@ void bGroup::setup(double _x, double _y,double wid,double hgt){
 	base.blocksOn.reserve(100);
 	states.recordState(storageState(blocks,base));
   held.setup(0,0);
+  
+  mapp.loadImage("maps/map_2.jpg");
+  turtle.setup(2.5*(mapp.width/12.),mapp.width-1.5*(mapp.width/12.), 25*4.25,4.5*25);
+  actionTime.set(0.01);
+  pixPerInch=mapp.width/48;
+  currentTest=0;
 }
 
 int bGroup::size(){
@@ -551,25 +559,18 @@ void bGroup::addFromSB(block t,int _x,int _y){
 
 void bGroup::update()
 {
-	for (unsigned int i=0; i<blocks.size(); i++) {
-		blocks[i].newUpdateHeight();
-		blocks[i].newUpdatePositions();
-	}
-	base.newUpdateHeight();
-	base.newUpdatePositions();
+  if(!bTesting){
+    for (unsigned int i=0; i<blocks.size(); i++) {
+      blocks[i].newUpdateHeight();
+      blocks[i].newUpdatePositions();
+    }
+  }
+  base.newUpdateHeight();
+  base.newUpdatePositions();
 	
-	/*for (unsigned int i=0; i<blocks.size(); i++) {
-		if(inHand&&blocks[i].bGrabbed){
-			for (unsigned int j=0; j<blocks.size(); j++) {
-				if(i!=j) heightUpdate(blocks[i], blocks[j]);
-				if(blocks[i].onInside(blocks[j].x,blocks[j].y)&&!blocks[j].numBlock&&!blocks[i].inBlockIn(blocks[j].x, blocks[j].y)){
-					blocks[i].h=blocks[j].heightOnlyOn(true)+blocks[i].heightInside()+blocks[j].h+65-((!blocks[i].numInside())?blocks[j].yIn0:0)-5;
-					blocks[i].updatePositions(blocks[i]);
-				}
-			}
-			heightUpdate(blocks[i], base);
-		}
-	}*/
+  if(bTesting){
+    bSequencePlay=idleSequence(&base);
+  }
 }
 
 

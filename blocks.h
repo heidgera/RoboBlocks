@@ -23,6 +23,7 @@
 #include <fstream>
 #include <algorithm>
 #include <deque>
+#include "turtle.h"
 
 
 
@@ -38,10 +39,15 @@ enum ofBlockActions {
 struct blockAction {
   ofBlockActions act;
   double data[2];
+  double nDone;
   string dataStr;
+  bool bExecuted;
+  bool bData;
+  bool bParsed;
   blockAction(){
     act=OF_BLOCK_NULL_ACT;
     data[0]=data[1]=0;
+    bData=bParsed=bExecuted=false;
   }
   blockAction(ofBlockActions a, double d1, double d2=0){
     act=a,data[0]=d1,data[1]=d2;
@@ -128,6 +134,8 @@ public:
   void parseAction();
   
   double parseNumber(string str);
+  
+  void executeAction();
   
   //*********** draw functions
 	
@@ -280,7 +288,14 @@ class bGroup: public ofInterObj {
 	ofImage rTop;
 	ofImage	rBot;
 	ofImage rSide;
+  
+  ofTimer actionTime;
+  bool bSequencePlay;
+  bool bTesting;
 public:
+  ofImage mapp;
+  ofTurtle turtle;
+  
 	block base;
 	clock_t dblClick;
 	int lastBlock;
@@ -308,6 +323,34 @@ public:
 	int size();
 	
 	block operator[](int i);
+  
+  
+  
+  void parseActions();
+  
+  void startTesting();
+  
+  void stopTesting();
+  
+  void startSequence();
+  
+  bool idleSequence(block * search);
+  
+  bool checkAgainstImage();
+  
+  void pauseSequence();
+  
+  bool isTesting();
+  
+  block * currentTest;
+  
+  void drawCurrentBlock();
+  
+  bool interpretDataStr(string str);
+  
+  block * nextActionBlock(block & b,bool skip=false);
+  
+  
 	
 	void addFromSB(block t,int x,int y);
 	
