@@ -75,11 +75,11 @@ bool ofTurtle::front(int pixels, vector<wall> & walls)
   return ret;
 }
 
-bool ofTurtle::frontIsClear(int pixels, ofImage & walls)
+bool ofTurtle::sensorIsClear(ofPoint strtPnt,int pixels, ofImage & walls)
 {
   bool ret=false;
   unsigned char * k=walls.getPixels();
-  ofPoint ps=pos+bearing.unit()*pixels;
+  ofPoint ps=strtPnt+bearing.unit()*pixels;
   int wid=walls.width;
   int hgt=walls.height;
   if(ps.x>0&&ps.x<wid&&ps.y>0&&ps.y<hgt){
@@ -91,6 +91,47 @@ bool ofTurtle::frontIsClear(int pixels, ofImage & walls)
   return ret;
 }
 
+bool ofTurtle::frontIsClear(int pixels, ofImage & walls)
+{
+  /*bool ret=false;
+  unsigned char * k=walls.getPixels();
+  ofPoint ps=pos+bearing.unit()*pixels;
+  int wid=walls.width;
+  int hgt=walls.height;
+  if(ps.x>0&&ps.x<wid&&ps.y>0&&ps.y<hgt){
+    ret=true;
+    if(k[int(ps.y)*wid*3+int(ps.x)*3+1]>200){
+      ret=false;
+    }
+  }
+  return ret;*/
+  return sensorIsClear(pos, pixels, walls);
+}
+
+bool ofTurtle::frontLeftIsClear(int pixels, ofImage & walls)
+{
+  ofPoint ps=pos+bearing.ortho().unit()*w/2;
+  return sensorIsClear(ps, pixels, walls);
+}
+
+bool ofTurtle::frontRightIsClear(int pixels, ofImage & walls)
+{
+  ofPoint ps=pos-bearing.ortho().unit()*w/2;
+  return sensorIsClear(ps, pixels, walls);
+}
+
+bool ofTurtle::rightIsClear(int pixels, ofImage & walls)
+{
+  ofPoint ps=pos+bearing.ortho().unit()*w/2;
+  return sensorIsClear(ps, pixels, walls);
+}
+
+bool ofTurtle::leftIsClear(int pixels, ofImage & walls)
+{
+  ofPoint ps=pos+bearing.ortho().unit()*w/2;
+  return sensorIsClear(ps, pixels, walls);
+}
+
 ofPoint ofTurtle::pointAlongBearing(int pix)
 {
    return pos+bearing.unit()*pix;
@@ -100,8 +141,8 @@ void ofTurtle::draw(int _x, int _y)
 {
   int body=w-whlWid*2;
   int leng=h;
-  for (unsigned int i=0; i<lines.size()&&lines.size()>1; i++) {
-    ofSetLineWidth(3);
+  for (unsigned int i=0; i<lines.size()-1&&lines.size()>1; i++) {
+    ofSetLineWidth(2);
     ofLine(lines[i].x, lines[i].y, lines[i+1].x, lines[i+1].y);
   }
   ofPushMatrix();

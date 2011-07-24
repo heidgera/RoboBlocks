@@ -296,15 +296,16 @@ void testApp::draw(){
     ofScale(((double)ofGetHeight()-200.)/(double)blocks.mapp.width, (double(ofGetHeight())-200.)/double(blocks.mapp.width), 1);
     ofSetColor(255, 255, 255);
     blocks.mapp.draw(0, 0);
-    ofSetColor(0, 255, 0);
-    for (unsigned int i=0; i<walls().size(); i++) {
-      ofRect(walls()[i].pos.x,walls()[i].pos.y,walls()[i].w,walls()[i].h);
-    }
+    
     blocks.turtle.draw(0, 0);
     
-    if(!blocks.turtle.frontIsClear(4*pixPerInch, blocks.mapp)) ofSetColor(255, 0, 0);
+    if(!blocks.turtle.frontLeftIsClear(4*pixPerInch, blocks.mapp)) ofSetColor(255, 0, 0);
     else ofSetColor(0, 255, 0);
-    ofPoint ps = blocks.turtle.pointAlongBearing(4*pixPerInch);
+    ofPoint ps = (blocks.turtle.pos+blocks.turtle.bearing.ortho().unit()*blocks.turtle.w/2)+blocks.turtle.bearing.unit()*4*pixPerInch;
+    ofCircle(ps.x, ps.y, 5);
+    if(!blocks.turtle.frontRightIsClear(4*pixPerInch, blocks.mapp)) ofSetColor(255, 0, 0);
+    else ofSetColor(0, 255, 0);
+    ps = (blocks.turtle.pos+blocks.turtle.bearing.ortho().unit()*(-blocks.turtle.w/2))+blocks.turtle.bearing.unit()*4*pixPerInch;
     ofCircle(ps.x, ps.y, 5);
     ofPopMatrix();
   }

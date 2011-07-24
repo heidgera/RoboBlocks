@@ -277,6 +277,8 @@ bool bGroup::interpretDataStr(string str)
     cout << spl[i] << endl;
     if(spl[i]=="!") negate=true;
     else if(spl[i]=="front") ret=turtle.frontIsClear(ofToFloat(spl[i+1])*pixPerInch, mapp);
+    else if(spl[i]=="frontLeft") ret=turtle.frontLeftIsClear(ofToFloat(spl[i+1])*pixPerInch, mapp);
+    else if(spl[i]=="frontRight") ret=turtle.frontRightIsClear(ofToFloat(spl[i+1])*pixPerInch, mapp);
     else if(spl[i]=="forever") ret=1;
   }
   if(negate) ret=!ret;
@@ -301,15 +303,15 @@ bool bGroup::idleSequence(block * search)
           case OF_BLOCK_MOVE:
             if(bA.data[0]<0){
               if(bA.data[0]<bA.data[1]){
-                turtle.move(-1);
-                bA.data[1]--;
+                turtle.move(-2);
+                bA.data[1]-=2;
               }
               else bA.bExecuted=true;
             }
             else {
               if(bA.data[0]>bA.data[1]){
-                turtle.move(1);
-                bA.data[1]++;
+                turtle.move(2);
+                bA.data[1]+=2;
               }
               else bA.bExecuted=true;
             }
@@ -320,15 +322,15 @@ bool bGroup::idleSequence(block * search)
           case OF_BLOCK_TURN:
             if(bA.data[0]<0){
               if(bA.data[0]<bA.data[1]){
-                turtle.turn(-1);
-                bA.data[1]--;
+                turtle.turn(-2);
+                bA.data[1]-=2;
               }
               else bA.bExecuted=true;
             }
             else{
               if(bA.data[0]>bA.data[1]){
-                turtle.turn(1);
-                bA.data[1]++;
+                turtle.turn(2);
+                bA.data[1]+=2;
               }
               else bA.bExecuted=true;
             }
