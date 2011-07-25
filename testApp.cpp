@@ -307,6 +307,16 @@ void testApp::draw(){
     else ofSetColor(0, 255, 0);
     ps = (blocks.turtle.pos+blocks.turtle.bearing.ortho().unit()*(-blocks.turtle.w/2))+blocks.turtle.bearing.unit()*4*pixPerInch;
     ofCircle(ps.x, ps.y, 5);
+    
+    if(!blocks.turtle.rightIsClear(2*pixPerInch, blocks.mapp)) ofSetColor(255, 0, 0);
+    else ofSetColor(0, 255, 0);
+    ps = blocks.turtle.pos-blocks.turtle.bearing.ortho().unit()*blocks.turtle.w/2-blocks.turtle.bearing.unit()*blocks.turtle.w/2+blocks.turtle.bearing.unit().rotate(90)*2*pixPerInch;
+    ofCircle(ps.x, ps.y, 5);
+    
+    if(!blocks.turtle.leftIsClear(2*pixPerInch, blocks.mapp)) ofSetColor(255, 0, 0);
+    else ofSetColor(0, 255, 0);
+    ps = blocks.turtle.pos+blocks.turtle.bearing.ortho().unit()*blocks.turtle.w/2-blocks.turtle.bearing.unit()*blocks.turtle.w/2+blocks.turtle.bearing.unit().rotate(270)*2*pixPerInch;
+    ofCircle(ps.x, ps.y, 5);
     ofPopMatrix();
   }
 }

@@ -75,11 +75,14 @@ bool ofTurtle::front(int pixels, vector<wall> & walls)
   return ret;
 }
 
-bool ofTurtle::sensorIsClear(ofPoint strtPnt,int pixels, ofImage & walls)
+bool ofTurtle::sensorIsClear(ofPoint strtPnt,int pixels, ofImage & walls, int direction)
 {
   bool ret=false;
   unsigned char * k=walls.getPixels();
-  ofPoint ps=strtPnt+bearing.unit()*pixels;
+  ofPoint ps;
+  if(direction)
+    ps=strtPnt+bearing.unit().rotate(direction)*pixels;
+  else ps=strtPnt+bearing.unit()*pixels;
   int wid=walls.width;
   int hgt=walls.height;
   if(ps.x>0&&ps.x<wid&&ps.y>0&&ps.y<hgt){
@@ -122,14 +125,14 @@ bool ofTurtle::frontRightIsClear(int pixels, ofImage & walls)
 
 bool ofTurtle::rightIsClear(int pixels, ofImage & walls)
 {
-  ofPoint ps=pos+bearing.ortho().unit()*w/2;
-  return sensorIsClear(ps, pixels, walls);
+  ofPoint ps=pos-bearing.ortho().unit()*w/2-bearing.unit()*w/2;
+  return sensorIsClear(ps, pixels, walls,90);
 }
 
 bool ofTurtle::leftIsClear(int pixels, ofImage & walls)
 {
-  ofPoint ps=pos+bearing.ortho().unit()*w/2;
-  return sensorIsClear(ps, pixels, walls);
+  ofPoint ps=pos+bearing.ortho().unit()*w/2-bearing.unit()*h/2;
+  return sensorIsClear(ps, pixels, walls,270);
 }
 
 ofPoint ofTurtle::pointAlongBearing(int pix)

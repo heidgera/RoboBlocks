@@ -42,7 +42,7 @@ public:
   void turn(int degrees);
   void clear(){ lines.clear();}
   bool front(int pixels, vector<wall> & walls);
-  bool sensorIsClear(ofPoint strtPnt,int pixels, ofImage & walls);
+  bool sensorIsClear(ofPoint strtPnt,int pixels, ofImage & walls, int direction=0);
   bool frontIsClear(int pixels, ofImage & walls);
   bool frontLeftIsClear(int pixels, ofImage & walls);
   bool frontRightIsClear(int pixels, ofImage & walls);

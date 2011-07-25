@@ -279,6 +279,8 @@ bool bGroup::interpretDataStr(string str)
     else if(spl[i]=="front") ret=turtle.frontIsClear(ofToFloat(spl[i+1])*pixPerInch, mapp);
     else if(spl[i]=="frontLeft") ret=turtle.frontLeftIsClear(ofToFloat(spl[i+1])*pixPerInch, mapp);
     else if(spl[i]=="frontRight") ret=turtle.frontRightIsClear(ofToFloat(spl[i+1])*pixPerInch, mapp);
+    else if(spl[i]=="leftPath") ret=turtle.leftIsClear(ofToFloat(spl[i+1])*pixPerInch, mapp);
+    else if(spl[i]=="rightPath") ret=turtle.rightIsClear(ofToFloat(spl[i+1])*pixPerInch, mapp);
     else if(spl[i]=="forever") ret=1;
   }
   if(negate) ret=!ret;
@@ -352,7 +354,7 @@ bool bGroup::idleSequence(block * search)
             if(interpretDataStr(bA.dataStr)||bA.bData){
               bA.bData=true;
               if(!idleSequence(&nxt))
-                bA.bExecuted=true;
+                bA.bExecuted=true,bA.bData;
             }
             else bA.bExecuted=true;
             break;
