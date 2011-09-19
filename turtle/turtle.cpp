@@ -96,18 +96,7 @@ bool ofTurtle::sensorIsClear(ofPoint strtPnt,int pixels, ofImage & walls, int di
 
 bool ofTurtle::frontIsClear(int pixels, ofImage & walls)
 {
-  /*bool ret=false;
-  unsigned char * k=walls.getPixels();
-  ofPoint ps=pos+bearing.unit()*pixels;
-  int wid=walls.width;
-  int hgt=walls.height;
-  if(ps.x>0&&ps.x<wid&&ps.y>0&&ps.y<hgt){
-    ret=true;
-    if(k[int(ps.y)*wid*3+int(ps.x)*3+1]>200){
-      ret=false;
-    }
-  }
-  return ret;*/
+  
   return sensorIsClear(pos, pixels, walls);
 }
 
